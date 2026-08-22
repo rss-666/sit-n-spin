@@ -12,11 +12,4 @@ if command -v php >/dev/null 2>&1; then
     done < <(find "$ROOT/$PLUGIN" -type f -name '*.php' -print0)
 fi
 
-rm -f "$ARCHIVE"
-(
-    cd "$ROOT"
-    zip -qr "$ARCHIVE" "$PLUGIN" \
-        -x '*/.DS_Store' '*.log' '*.tmp'
-)
-
-echo "Created $ARCHIVE"
+python3 "$ROOT/bin/make-plugin-zip.py" "$ROOT/$PLUGIN" "$ARCHIVE"
