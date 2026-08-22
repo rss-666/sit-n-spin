@@ -28,6 +28,20 @@ The plugin does not automatically publish and does not store or reproduce comple
 4. Add an approved public feed under Content Briefings -> Sources.
 5. Run an import and review items in Content Briefings -> Review Queue.
 
+== Recommended Test Feeds ==
+
+For the first test, leave Keywords and Categories blank so filters cannot hide valid items.
+
+* WordPress.org Security: `https://wordpress.org/news/category/security/feed/`
+* Wordfence Security: `https://www.wordfence.com/blog/feed/`
+* Sucuri Security Blog: `https://blog.sucuri.net/feed`
+* Official WordPress News: `https://wordpress.org/news/feed/`
+* WP Tavern: `https://wptavern.com/feed`
+
+Start with WordPress.org Security, run an import, and then run the same feed again to exercise duplicate detection. After the first successful import, useful keyword filters include WordPress, vulnerability, security, exploit, malware, plugin, patch, and update.
+
+Review each source's reliability and usage terms before using it in an editorial workflow. These URLs are testing suggestions, not an endorsement of every article.
+
 == Frequently Asked Questions ==
 
 = Is an AI provider required? =

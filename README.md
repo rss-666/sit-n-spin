@@ -107,6 +107,37 @@ Do not accept an endpoint from an untrusted user. WordPress safe HTTP APIs and H
 
 Private, loopback, local, malformed, and non-HTTP feed addresses are rejected through WordPress URL validation. Redirects are limited to three. A successful fetch updates source health even when every item is filtered.
 
+### Recommended test feeds
+
+Start with the official WordPress security feed. For the first import, leave **Keywords** and **Categories** blank so filters cannot hide otherwise valid items.
+
+| Suggested name | Feed URL | Focus |
+|---|---|---|
+| WordPress.org Security | `https://wordpress.org/news/category/security/feed/` | Official WordPress security releases and notices |
+| Wordfence Security | `https://www.wordfence.com/blog/feed/` | WordPress vulnerabilities, malware, firewall research, and weekly reports |
+| Sucuri Security Blog | `https://blog.sucuri.net/feed` | Website security, malware, hardening, and vulnerability roundups |
+| WordPress News | `https://wordpress.org/news/feed/` | Official general WordPress releases and community news |
+| WP Tavern | `https://wptavern.com/feed` | Broad WordPress ecosystem news, products, and interviews |
+
+Recommended first-test source:
+
+```text
+Name: WordPress.org Security
+Feed URL: https://wordpress.org/news/category/security/feed/
+Enabled: Yes
+Keywords: (leave blank)
+Categories: (leave blank)
+Frequency: Hourly
+```
+
+After confirming that import works, useful keyword filters include:
+
+```text
+WordPress, vulnerability, security, exploit, malware, plugin, patch, update
+```
+
+Run the same feed twice to exercise duplicate detection. The second run should not create another active queue item for an identical normalized URL. Add feeds only after reviewing their reliability and usage terms; inclusion here is a testing suggestion, not an endorsement of every article.
+
 ## Editorial Workflow
 
 1. Open **Content Briefings → Review Queue**.
