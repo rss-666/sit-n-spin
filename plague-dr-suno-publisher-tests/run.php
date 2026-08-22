@@ -1,0 +1,112 @@
+<?php
+/**
+ * Dependency-free tests for Plague Dr Suno Publisher.
+ */
+
+require __DIR__ . '/bootstrap.php';
+
+$passed = 0;
+$failed = 0;
+
+function pdrs_test( string $name, callable $test ): void {
+    global $passed, $failed;
+    try {
+        $test();
+        ++$passed;
+        echo "PASS {$name}\n";
+    } catch ( Throwable $error ) {
+        ++$failed;
+        echo "FAIL {$name}: {$error->getMessage()}\n";
+    }
+}
+
+function pdrs_assert( bool $condition, string $message = 'Assertion failed.' ): void {
+    if ( ! $condition ) {
+        throw new RuntimeException( $message );
+    }
+}
+
+function pdrs_same( $expected, $actual ): void {
+    pdrs_assert( $expected === $actual, 'Expected ' . var_export( $expected, true ) . ', got ' . var_export( $actual, true ) );
+}
+
+$uuid = '0b2647f2-07bc-4e51-8822-10d5cca2c495';
+
+pdrs_test( 'Full Suno song URL becomes canonical source and embed URLs', static function () use ( $uuid ): void {
+    $result = PDRS_Suno_URL::parse_direct( 'https://suno.com/song/' . $uuid . '?share=1' );
+    pdrs_assert( is_array( $result ) );
+    pdrs_same( $uuid, $result['song_id'] );
+    pdrs_same( 'https://suno.com/song/' . $uuid, $result['source_url'] );
+    pdrs_same( 'https://suno.com/embed/' . $uuid, $result['embed_url'] );
+} );
+
+pdrs_test( 'Suno embed and legacy host URLs are accepted', static function () use ( $uuid ): void {
+    pdrs_assert( is_array( PDRS_Suno_URL::parse_direct( 'suno.com/embed/' . $uuid ) ) );
+    pdrs_assert( is_array( PDRS_Suno_URL::parse_direct( 'https://suno.ai/song/' . $uuid ) ) );
+} );
+
+pdrs_test( 'Non-Suno and deceptive hosts are rejected', static function () use ( $uuid ): void {
+    pdrs_assert( PDRS_Suno_URL::parse_direct( 'https://attacker.example/song/' . $uuid ) instanceof WP_Error );
+    pdrs_assert( PDRS_Suno_URL::parse_direct( 'https://suno.com.attacker.example/song/' . $uuid ) instanceof WP_Error );
+} );
+
+pdrs_test( 'Malformed song identifiers are rejected', static function (): void {
+    pdrs_assert( ! PDRS_Suno_URL::valid_song_id( '../../bad' ) );
+    pdrs_assert( PDRS_Suno_URL::parse_direct( 'https://suno.com/song/not-a-song-id' ) instanceof WP_Error );
+} );
+
+pdrs_test( 'Artwork sanitizer accepts HTTPS and rejects local or insecure URLs', static function (): void {
+    pdrs_same( 'https://cdn2.suno.ai/cover.jpeg', PDRS_Metadata::image_url( 'https://cdn2.suno.ai/cover.jpeg' ) );
+    pdrs_same( '', PDRS_Metadata::image_url( 'http://cdn2.suno.ai/cover.jpeg' ) );
+    pdrs_same( '', PDRS_Metadata::image_url( 'https://localhost/cover.jpeg' ) );
+    pdrs_same( '', PDRS_Metadata::image_url( 'https://127.0.0.1/cover.jpeg' ) );
+} );
+
+pdrs_test( 'Player HTML uses a generated Suno embed and escapes editable content', static function () use ( $uuid ): void {
+    $GLOBALS['pdrs_posts'][101] = (object) array(
+        'ID' => 101,
+        'post_type' => PDRS_Plugin::POST_TYPE,
+        'post_status' => 'publish',
+        'post_title' => 'Plague <script>alert(1)</script> Song',
+        'post_content' => 'Credits <script>alert(2)</script>',
+    );
+    $GLOBALS['pdrs_meta'][101] = array(
+        '_pdrs_song_id' => $uuid,
+        '_pdrs_artwork_url' => 'https://cdn2.suno.ai/cover.jpeg',
+        '_pdrs_position' => 'after',
+        '_pdrs_destination_id' => 10,
+    );
+    $html = PDRS_Renderer::song_html( 101 );
+    pdrs_assert( str_contains( $html, 'https://suno.com/embed/' . $uuid ) );
+    pdrs_assert( str_contains( $html, 'Plague &lt;script&gt;alert(1)&lt;/script&gt; Song' ) );
+    pdrs_assert( ! str_contains( $html, '<script>' ) );
+    pdrs_assert( str_contains( $html, 'loading="lazy"' ) );
+} );
+
+pdrs_test( 'Changing destination moves automatic placement without stale markup', static function (): void {
+    $renderer = new PDRS_Renderer();
+    $GLOBALS['pdrs_queried_id'] = 10;
+    $GLOBALS['pdrs_meta'][101]['_pdrs_destination_id'] = 10;
+    $at_first = $renderer->destination_content( '<p>Page ten</p>' );
+    pdrs_assert( str_contains( $at_first, 'data-suno-song-id' ) );
+
+    $GLOBALS['pdrs_meta'][101]['_pdrs_destination_id'] = 20;
+    $old_destination = $renderer->destination_content( '<p>Page ten</p>' );
+    pdrs_same( '<p>Page ten</p>', $old_destination );
+
+    $GLOBALS['pdrs_queried_id'] = 20;
+    $new_destination = $renderer->destination_content( '<p>Page twenty</p>' );
+    pdrs_assert( str_contains( $new_destination, 'data-suno-song-id' ) );
+} );
+
+pdrs_test( 'Draft shortcode stays hidden from visitors but remains previewable to editors', static function (): void {
+    $GLOBALS['pdrs_posts'][101]->post_status = 'draft';
+    $renderer = new PDRS_Renderer();
+    $GLOBALS['pdrs_can_edit'] = false;
+    pdrs_same( '', $renderer->shortcode( array( 'id' => 101 ) ) );
+    $GLOBALS['pdrs_can_edit'] = true;
+    pdrs_assert( str_contains( $renderer->shortcode( array( 'id' => 101 ) ), 'data-suno-song-id' ) );
+} );
+
+echo "\n{$passed} passed, {$failed} failed\n";
+exit( $failed ? 1 : 0 );

@@ -12,8 +12,11 @@
     "wp-coding-standards/wpcs": "^3.1"
   },
   "scripts": {
-    "lint": "find the-runbook-briefings tests -name '*.php' -print0 | xargs -0 -n1 php -l",
-    "test": "php tests/run.php",
+    "lint": "find the-runbook-briefings tests plague-dr-suno-publisher plague-dr-suno-publisher-tests -name '*.php' -print0 | xargs -0 -n1 php -l",
+    "test": [
+      "php tests/run.php",
+      "php plague-dr-suno-publisher-tests/run.php"
+    ],
     "test:phpunit": "phpunit"
   },
   "config": {

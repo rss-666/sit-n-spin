@@ -243,6 +243,18 @@ See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for feed, cron, provider,
 - WP-Cron timing depends on site traffic unless a system scheduler is configured.
 - Factual quality still requires a human editor; a short feed excerpt may be insufficient for some stories.
 
+## Additional Standalone Plugin
+
+This repository also includes **Plague Dr Suno Publisher** in `plague-dr-suno-publisher/`. It accepts a public Suno song URL, lets an editor choose or later change any WordPress page/post destination, and displays Suno’s hosted player without rewriting the destination’s stored content or rehosting audio.
+
+Build its installable package with:
+
+```bash
+./bin/package-suno.sh
+```
+
+See [docs/PLAGUE-DR-SUNO-PUBLISHER.md](docs/PLAGUE-DR-SUNO-PUBLISHER.md) for usage, privacy, and troubleshooting.
+
 ## License
 
 GPL-2.0-or-later. See [LICENSE](LICENSE).
