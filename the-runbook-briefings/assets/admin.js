@@ -23,7 +23,10 @@
             nonce.value = actionButton.dataset.trbNonce;
         }
         if ( 'trb_generate' === actionButton.dataset.trbAction ) {
-            actionButton.disabled = true;
+            // Keep the submit control enabled until the browser completes its
+            // default form action. Disabling it during this click event can
+            // cancel submission in some browsers and leave the UI stuck.
+            actionButton.setAttribute( 'aria-busy', 'true' );
             actionButton.textContent = 'Generating…';
         }
     } );

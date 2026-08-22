@@ -167,7 +167,7 @@
         <label><span>Test date</span><input data-env="date" type="date"></label>
         <label><span>WordPress version</span><input data-env="wordpress" placeholder="Example: 6.8.2"></label>
         <label><span>PHP version</span><input data-env="php" placeholder="Example: 8.3"></label>
-        <label><span>Plugin version</span><input data-env="plugin" value="1.0.2"></label>
+        <label><span>Plugin version</span><input data-env="plugin" value="1.0.3"></label>
         <label><span>Browser/device</span><input data-env="browser" placeholder="Chrome on Windows 11"></label>
         <label><span>Active theme</span><input data-env="theme" placeholder="Theme name"></label>
         <label><span>Hosting/cache/security notes</span><input data-env="stack" placeholder="cPanel, Cloudflare, security plugins…"></label>
@@ -256,7 +256,7 @@
         { id: 'queue-source', title: 'Source details and attribution preview are correct', summary: 'The original story remains traceable.', steps: ['Open a New item.', 'Compare source name, title, date, URL, and excerpt to the feed article.'], expected: 'Metadata is correct, the original link opens safely, and attribution preview is visible.' },
         { id: 'queue-notes', title: 'Manual fields and editorial notes persist', summary: 'Editing without AI works.', steps: ['Enter a headline, factual summary, analysis, implications, and private note.', 'Choose Save changes and reload.'], expected: 'All fields persist; the private editorial note is clearly separate from draft content.' },
         { id: 'queue-dismiss', title: 'Dismiss and return-to-queue actions work', summary: 'Editors can remove and recover an item.', steps: ['Dismiss a disposable item.', 'Filter to Dismissed, open it, and return it to the queue.'], expected: 'Status and processing history record both transitions.' },
-        { id: 'queue-no-ai', title: 'Generate fails gracefully without AI configuration', summary: 'Manual work is not lost.', steps: ['With AI disabled/no key, enter a private note or manual text.', 'Choose Generate suggestions.'], expected: 'An actionable configuration message appears; existing manual fields remain available.' }
+        { id: 'queue-no-ai', title: 'Generate fails gracefully without AI configuration', summary: 'Manual work is not lost.', steps: ['With AI disabled/no key, enter a private note or manual text.', 'Choose Generate suggestions.'], expected: 'An actionable configuration message appears promptly; the button does not remain stuck on Generating, and existing manual fields remain available.' }
       ]},
       { title: 'AI generation (optional)', tests: [
         { id: 'ai-generate', title: 'Provider returns editable structured suggestions', summary: 'Requires your own provider key and may incur charges.', optional: true, steps: ['Configure a supported key/model.', 'Open a suitable item and choose Generate suggestions.'], expected: 'Headline, factual summary, Why this matters, implications, and zero-to-three internal links populate for review; nothing publishes.' },
@@ -282,7 +282,7 @@
     const STORAGE_KEY = 'runbook-briefings-qa-v1';
     const allTests = sections.flatMap(section => section.tests.map(test => ({ ...test, section: section.title })));
     const defaultState = () => ({
-      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.2', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
+      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.3', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
       results: Object.fromEntries(allTests.map(test => [test.id, { status: '', notes: '' }])),
       startedAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     });

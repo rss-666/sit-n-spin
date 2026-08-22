@@ -219,5 +219,11 @@ trb_test( 'Fetch Now refuses to overlap an active importer run', static function
     delete_transient( 'trb_import_lock' );
 } );
 
+trb_test( 'Generate control remains enabled long enough to submit its form', static function (): void {
+    $script = (string) file_get_contents( dirname( __DIR__ ) . '/the-runbook-briefings/assets/admin.js' );
+    trb_assert( str_contains( $script, "actionButton.textContent = 'Generating…'" ) );
+    trb_assert( ! str_contains( $script, 'actionButton.disabled = true' ), 'Generate click handler disables the submit control before default submission.' );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed > 0 ? 1 : 0 );
