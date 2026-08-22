@@ -28,7 +28,8 @@ The plugin should help publishers produce useful analysis, not mass-produce rewr
 4. Filter items by keywords, categories, source, date, and duplicate URL.
 5. Store discovered items in a custom database table or a suitable custom post type.
 6. Provide a WordPress admin review queue.
-7. For each imported item, let an editor:
+7. Provide an access-controlled affiliate review area where authorized affiliates can view proposed articles and approve them or request changes.
+8. For each imported item, let an editor:
    - Generate a factual summary.
    - Generate a suggested headline.
    - Generate a "Why this matters" section.
@@ -37,9 +38,9 @@ The plugin should help publishers produce useful analysis, not mass-produce rewr
    - Edit generated content.
    - Save the result as a WordPress draft.
    - Dismiss the item.
-8. Never publish automatically by default.
-9. Include source attribution in every briefing.
-10. Detect duplicates using normalized source URLs and title similarity.
+9. Never publish automatically by default.
+10. Include source attribution in every briefing.
+11. Detect duplicates using normalized source URLs and title similarity.
 
 ## Required Attribution
 
@@ -115,6 +116,23 @@ Use normal WordPress admin UI conventions. Display these statuses:
 - Error.
 
 Include useful empty states and actionable error messages. Use WordPress APIs and vanilla JavaScript unless another approach is genuinely required.
+
+## Affiliate Review Area
+
+Create a dedicated, access-controlled review area for affiliate reviewers. This may be a protected WordPress page or another WordPress-native interface, but it must not expose proposed articles publicly or require affiliates to have unrestricted administrator access.
+
+The affiliate review area must:
+
+- Display the proposed headline, briefing, Runbook analysis, practical implications, and complete source attribution.
+- Provide a link to the original source.
+- Show the article's current review status and relevant review history.
+- Allow an authorized affiliate to approve the article.
+- Allow an authorized affiliate to request changes with a required or strongly encouraged review note.
+- Restrict each affiliate to articles assigned or explicitly shared with them.
+- Verify capabilities, nonces, and ownership or assignment on every review action.
+- Record reviewer, decision, note, and timestamp without exposing API credentials or private logs.
+
+Affiliate approval must advance the editorial workflow only. It must never publish content automatically unless a future, separately configured workflow explicitly permits that action.
 
 ## Data Model
 
