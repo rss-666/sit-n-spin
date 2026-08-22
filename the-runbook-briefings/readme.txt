@@ -4,7 +4,7 @@ Tags: rss, editorial workflow, security, hosting, content curation
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,10 @@ It is encrypted with authenticated encryption derived from WordPress salts and i
 No. The importer stores source metadata and a configurable plain-text excerpt of 100 to 5,000 characters. The default is 1,200 characters. Every draft includes visible source attribution.
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed a critical error when opening a newly imported item whose editable briefing fields are still empty.
+* Added regression coverage for untouched queue items with null generated fields.
 
 = 1.0.1 =
 * Added a per-source Fetch Now action with immediate source health and import counts.

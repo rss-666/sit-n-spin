@@ -167,7 +167,7 @@
         <label><span>Test date</span><input data-env="date" type="date"></label>
         <label><span>WordPress version</span><input data-env="wordpress" placeholder="Example: 6.8.2"></label>
         <label><span>PHP version</span><input data-env="php" placeholder="Example: 8.3"></label>
-        <label><span>Plugin version</span><input data-env="plugin" value="1.0.1"></label>
+        <label><span>Plugin version</span><input data-env="plugin" value="1.0.2"></label>
         <label><span>Browser/device</span><input data-env="browser" placeholder="Chrome on Windows 11"></label>
         <label><span>Active theme</span><input data-env="theme" placeholder="Theme name"></label>
         <label><span>Hosting/cache/security notes</span><input data-env="stack" placeholder="cPanel, Cloudflare, security plugins…"></label>
@@ -251,6 +251,7 @@
         { id: 'import-bad-feed', title: 'Malformed/unavailable feed fails safely', summary: 'Optional failure/recovery test.', optional: true, steps: ['Add a public URL you control that returns malformed XML or a temporary error.', 'Run an import.'], expected: 'The site remains operational; source health and Logs show a bounded error that does not expose sensitive data.' }
       ]},
       { title: 'Review queue workflow', tests: [
+        { id: 'queue-open-untouched', title: 'Untouched imported item opens without a fatal', summary: 'Empty generated fields render as editable blank controls.', steps: ['Open a newly imported item before generating or manually saving any briefing text.', 'Scroll through the entire Editable briefing form.'], expected: 'The full review screen loads with blank summary/analysis fields and no critical-error message.' },
         { id: 'queue-filters', title: 'Queue filters and search work', summary: 'Status, source, and search narrow the list.', steps: ['Try status and source filters.', 'Search for part of an imported title.', 'Clear filters.'], expected: 'Results update correctly and empty states explain what to do.' },
         { id: 'queue-source', title: 'Source details and attribution preview are correct', summary: 'The original story remains traceable.', steps: ['Open a New item.', 'Compare source name, title, date, URL, and excerpt to the feed article.'], expected: 'Metadata is correct, the original link opens safely, and attribution preview is visible.' },
         { id: 'queue-notes', title: 'Manual fields and editorial notes persist', summary: 'Editing without AI works.', steps: ['Enter a headline, factual summary, analysis, implications, and private note.', 'Choose Save changes and reload.'], expected: 'All fields persist; the private editorial note is clearly separate from draft content.' },
@@ -281,7 +282,7 @@
     const STORAGE_KEY = 'runbook-briefings-qa-v1';
     const allTests = sections.flatMap(section => section.tests.map(test => ({ ...test, section: section.title })));
     const defaultState = () => ({
-      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.1', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
+      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.2', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
       results: Object.fromEntries(allTests.map(test => [test.id, { status: '', notes: '' }])),
       startedAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     });

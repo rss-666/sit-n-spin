@@ -320,8 +320,8 @@ final class TRB_Admin {
         ?><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="<?php echo esc_attr( $action ); ?>"><input type="hidden" name="item_id" value="<?php echo esc_attr( (string) $id ); ?>"><?php wp_nonce_field( $action . '_' . $id ); ?><button class="button <?php echo $destructive ? 'button-link-delete' : ''; ?>" type="submit"<?php if ( $destructive ) : ?> data-trb-confirm="<?php esc_attr_e( 'Dismiss this item?', 'the-runbook-briefings' ); ?>"<?php endif; ?>><?php echo esc_html( $label ); ?></button></form><?php
     }
 
-    private function editor_textarea( string $name, string $label, string $value, string $description, int $rows = 7 ): void {
-        ?><p><label for="trb-<?php echo esc_attr( $name ); ?>"><strong><?php echo esc_html( $label ); ?></strong></label><br><textarea class="large-text" id="trb-<?php echo esc_attr( $name ); ?>" name="briefing[<?php echo esc_attr( $name ); ?>]" rows="<?php echo esc_attr( (string) $rows ); ?>"><?php echo esc_textarea( $value ); ?></textarea><?php if ( $description ) : ?><br><span class="description"><?php echo esc_html( $description ); ?></span><?php endif; ?></p><?php
+    private function editor_textarea( string $name, string $label, ?string $value, string $description, int $rows = 7 ): void {
+        ?><p><label for="trb-<?php echo esc_attr( $name ); ?>"><strong><?php echo esc_html( $label ); ?></strong></label><br><textarea class="large-text" id="trb-<?php echo esc_attr( $name ); ?>" name="briefing[<?php echo esc_attr( $name ); ?>]" rows="<?php echo esc_attr( (string) $rows ); ?>"><?php echo esc_textarea( (string) $value ); ?></textarea><?php if ( $description ) : ?><br><span class="description"><?php echo esc_html( $description ); ?></span><?php endif; ?></p><?php
     }
 
     /**

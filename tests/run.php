@@ -152,6 +152,19 @@ trb_test( 'Review action rejects invalid nonce', static function (): void {
     throw new RuntimeException( 'Invalid nonce was accepted.' );
 } );
 
+require_once dirname( __DIR__ ) . '/the-runbook-briefings/includes/class-trb-admin.php';
+trb_test( 'Brand-new item renders empty briefing textareas without a fatal', static function (): void {
+    $reflection = new ReflectionClass( TRB_Admin::class );
+    $admin      = $reflection->newInstanceWithoutConstructor();
+    $method     = $reflection->getMethod( 'editor_textarea' );
+    $method->setAccessible( true );
+    ob_start();
+    $method->invoke( $admin, 'factual_summary', 'Factual summary', null, 'Source-supported facts.' );
+    $html = (string) ob_get_clean();
+    trb_assert( str_contains( $html, 'name="briefing[factual_summary]"' ) );
+    trb_assert( str_contains( $html, '<textarea' ) );
+} );
+
 // Minimal collaborators for focused single-source importer tests.
 $GLOBALS['trb_test_transients'] = array();
 function get_transient( string $key ) { return $GLOBALS['trb_test_transients'][ $key ] ?? false; }

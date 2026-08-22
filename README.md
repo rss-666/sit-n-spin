@@ -42,7 +42,7 @@ No production PHP packages or JavaScript frameworks are required.
 
 ### From the installable ZIP
 
-1. Build or download `the-runbook-briefings-1.0.1.zip`.
+1. Build or download `the-runbook-briefings-1.0.2.zip`.
 2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**.
 3. Upload the ZIP, install it, and activate **The Runbook Briefings**.
 4. Open **Content Briefings → Settings** and review the defaults.
@@ -261,7 +261,7 @@ Run:
 ./bin/package.sh
 ```
 
-The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.1.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
+The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.2.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
 
 ## Troubleshooting
 
