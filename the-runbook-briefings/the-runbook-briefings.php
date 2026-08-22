@@ -3,7 +3,7 @@
  * Plugin Name:       The Runbook Briefings
  * Plugin URI:        https://github.com/rss-666/sit-n-spin
  * Description:       Turns approved hosting and WordPress security RSS stories into original, source-attributed editorial briefings.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            The Runbook
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TRB_VERSION', '1.0.0' );
+define( 'TRB_VERSION', '1.0.1' );
 define( 'TRB_DB_VERSION', '1.0.0' );
 define( 'TRB_PLUGIN_FILE', __FILE__ );
 define( 'TRB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );

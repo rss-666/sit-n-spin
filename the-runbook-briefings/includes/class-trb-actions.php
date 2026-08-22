@@ -19,6 +19,7 @@ final class TRB_Actions {
             'trb_save_source'     => 'save_source',
             'trb_delete_source'   => 'delete_source',
             'trb_toggle_source'   => 'toggle_source',
+            'trb_fetch_source'    => 'fetch_source',
             'trb_run_import'      => 'run_import',
             'trb_save_settings'   => 'save_settings',
             'trb_save_briefing'   => 'save_briefing',
@@ -65,6 +66,36 @@ final class TRB_Actions {
         $enabled = ! empty( $_POST['enabled'] );
         $this->sources->set_enabled( $id, $enabled );
         $this->notice( 'success', $enabled ? __( 'Source enabled.', 'the-runbook-briefings' ) : __( 'Source disabled.', 'the-runbook-briefings' ) );
+        $this->redirect( 'admin.php?page=trb-sources' );
+    }
+
+    public function fetch_source(): void {
+        $id = absint( $_POST['source_id'] ?? 0 );
+        TRB_Security::require_manage( 'trb_fetch_source_' . $id );
+        $source = $this->sources->find( $id );
+        if ( ! $source ) {
+            $this->notice( 'error', __( 'The source no longer exists.', 'the-runbook-briefings' ) );
+            $this->redirect( 'admin.php?page=trb-sources' );
+        }
+
+        $result = ( new TRB_Importer() )->run_source( $source );
+        if ( is_wp_error( $result ) ) {
+            $this->notice( 'error', $result->get_error_message() );
+            $this->redirect( 'admin.php?page=trb-sources' );
+        }
+
+        $this->notice(
+            'success',
+            sprintf(
+                /* translators: 1: source name, 2: new count, 3: duplicate count, 4: filtered count, 5: error count. */
+                __( '%1$s fetched: %2$d new, %3$d duplicates, %4$d filtered, %5$d errors.', 'the-runbook-briefings' ),
+                (string) $source->name,
+                $result['imported'],
+                $result['duplicates'],
+                $result['filtered'],
+                $result['errors']
+            )
+        );
         $this->redirect( 'admin.php?page=trb-sources' );
     }
 

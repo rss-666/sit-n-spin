@@ -42,7 +42,7 @@ No production PHP packages or JavaScript frameworks are required.
 
 ### From the installable ZIP
 
-1. Build or download `the-runbook-briefings-1.0.0.zip`.
+1. Build or download `the-runbook-briefings-1.0.1.zip`.
 2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**.
 3. Upload the ZIP, install it, and activate **The Runbook Briefings**.
 4. Open **Content Briefings → Settings** and review the defaults.
@@ -103,7 +103,7 @@ Do not accept an endpoint from an untrusted user. WordPress safe HTTP APIs and H
 3. Optionally enter comma- or newline-delimited keywords. An item passes when any keyword appears in its title or short description.
 4. Optionally enter feed category labels. An item passes when any configured category matches.
 5. Add reliability/editorial notes and select a frequency.
-6. Save the source, then use **Run import now** on the dashboard.
+6. Save the source, then choose **Fetch Now** beside that source to test it immediately. Use **Run import now** on the dashboard when you want to fetch all enabled sources.
 
 Private, loopback, local, malformed, and non-HTTP feed addresses are rejected through WordPress URL validation. Redirects are limited to three. A successful fetch updates source health even when every item is filtered.
 
@@ -261,7 +261,7 @@ Run:
 ./bin/package.sh
 ```
 
-The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.0.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
+The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.1.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
 
 ## Troubleshooting
 

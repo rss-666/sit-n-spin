@@ -4,7 +4,7 @@ Tags: rss, editorial workflow, security, hosting, content curation
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,7 @@ The plugin does not automatically publish and does not store or reproduce comple
 2. Activate The Runbook Briefings.
 3. Review Content Briefings -> Settings.
 4. Add an approved public feed under Content Briefings -> Sources.
-5. Run an import and review items in Content Briefings -> Review Queue.
+5. Choose Fetch Now beside one source, or Run import now from the dashboard, then review items in Content Briefings -> Review Queue.
 
 == Recommended Test Feeds ==
 
@@ -61,6 +61,10 @@ It is encrypted with authenticated encryption derived from WordPress salts and i
 No. The importer stores source metadata and a configurable plain-text excerpt of 100 to 5,000 characters. The default is 1,200 characters. Every draft includes visible source attribution.
 
 == Changelog ==
+
+= 1.0.1 =
+* Added a per-source Fetch Now action with immediate source health and import counts.
+* Added recommended RSS test feeds to the bundled documentation.
 
 = 1.0.0 =
 * Initial production-quality MVP.

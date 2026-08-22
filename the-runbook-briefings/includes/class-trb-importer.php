@@ -52,6 +52,45 @@ final class TRB_Importer {
     }
 
     /**
+     * Fetch one selected source immediately, including a disabled source.
+     *
+     * @return array<string,int>|WP_Error
+     */
+    public function run_source( object $source ) {
+        if ( get_transient( 'trb_import_lock' ) ) {
+            TRB_Logger::log(
+                'warning',
+                'source_import_locked',
+                __( 'A manual source fetch was skipped because another import is active.', 'the-runbook-briefings' ),
+                array(),
+                (int) $source->id
+            );
+            return new WP_Error(
+                'trb_import_locked',
+                __( 'Another feed import is already running. Wait a moment and try Fetch Now again.', 'the-runbook-briefings' )
+            );
+        }
+
+        set_transient( 'trb_import_lock', 1, 10 * MINUTE_IN_SECONDS );
+        try {
+            $result = $this->import_source( $source, (int) TRB_Settings::get( 'max_items_per_run' ) );
+            TRB_Logger::prune();
+        } finally {
+            delete_transient( 'trb_import_lock' );
+        }
+
+        $stats = array_merge( array( 'sources' => 1 ), $result );
+        TRB_Logger::log(
+            'info',
+            'manual_source_import_complete',
+            __( 'Selected source fetch completed.', 'the-runbook-briefings' ),
+            $stats,
+            (int) $source->id
+        );
+        return $stats;
+    }
+
+    /**
      * @return array<string,int>
      */
     public function import_source( object $source, int $remaining ): array {

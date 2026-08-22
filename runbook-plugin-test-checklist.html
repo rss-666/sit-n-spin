@@ -167,7 +167,7 @@
         <label><span>Test date</span><input data-env="date" type="date"></label>
         <label><span>WordPress version</span><input data-env="wordpress" placeholder="Example: 6.8.2"></label>
         <label><span>PHP version</span><input data-env="php" placeholder="Example: 8.3"></label>
-        <label><span>Plugin version</span><input data-env="plugin" value="1.0.0"></label>
+        <label><span>Plugin version</span><input data-env="plugin" value="1.0.1"></label>
         <label><span>Browser/device</span><input data-env="browser" placeholder="Chrome on Windows 11"></label>
         <label><span>Active theme</span><input data-env="theme" placeholder="Theme name"></label>
         <label><span>Hosting/cache/security notes</span><input data-env="stack" placeholder="cPanel, Cloudflare, security plugins…"></label>
@@ -238,6 +238,7 @@
       ]},
       { title: 'RSS source management', tests: [
         { id: 'source-add', title: 'Add the official security feed', summary: 'A valid public feed can be saved.', steps: ['Name it WordPress.org Security.', 'Use https://wordpress.org/news/category/security/feed/.', 'Leave Keywords and Categories blank; enable it and save.'], expected: 'The source appears in the configured sources table with Not fetched or Healthy status.' },
+        { id: 'source-fetch-now', title: 'Fetch one source immediately', summary: 'Fetch Now imports only the selected source and reports its counts.', steps: ['Choose Fetch Now beside WordPress.org Security on the Sources screen.', 'Wait for the result notice and inspect source health.'], expected: 'Only that source is fetched; the notice reports new, duplicate, filtered, and error counts, and last-success health updates. The action also works as an explicit test while a source is disabled.' },
         { id: 'source-edit', title: 'Edit, disable, and re-enable a source', summary: 'Source controls persist correctly.', steps: ['Add a reliability note and save.', 'Disable the source, refresh, then re-enable it.'], expected: 'Name, URL, notes, frequency, and enabled state persist after each refresh.' },
         { id: 'source-unsafe', title: 'Unsafe/local feed URL is rejected', summary: 'SSRF-oriented validation blocks local addresses.', steps: ['Try adding http://127.0.0.1/feed.xml or http://localhost/feed/.'], expected: 'The source is rejected with an actionable public-URL validation message.' },
         { id: 'source-duplicate', title: 'Duplicate feed URL is rejected', summary: 'The same source cannot be configured twice.', steps: ['Try adding the exact official security feed URL a second time.'], expected: 'The duplicate source is not created and a useful notice appears.' }
@@ -280,7 +281,7 @@
     const STORAGE_KEY = 'runbook-briefings-qa-v1';
     const allTests = sections.flatMap(section => section.tests.map(test => ({ ...test, section: section.title })));
     const defaultState = () => ({
-      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.0', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
+      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.1', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
       results: Object.fromEntries(allTests.map(test => [test.id, { status: '', notes: '' }])),
       startedAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     });
