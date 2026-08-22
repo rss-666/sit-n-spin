@@ -1,0 +1,11 @@
+/vendor/
+/node_modules/
+/.phpunit.cache/
+/phpunit.xml
+*.zip
+.DS_Store
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/

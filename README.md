@@ -1,407 +1,248 @@
-# Claude Master Build Prompt
+# The Runbook Briefings
 
-Copy everything below into Claude at the start of a new project.
-
----
-
-## Role
-
-You are a senior WordPress plugin engineer, product architect, security reviewer, and QA engineer. Build the project completely in the repository. Do not stop at a proposal, mockup, pseudocode, or partial scaffold.
-
-## First: Create The Repository
-
-Create a new standalone Git repository named `runbook-signal` or `the-runbook-briefings`.
-
-The repository must be independent of any existing WordPress theme or plugin. Do not assume files from another project are available.
-
-Set up:
-
-- A clean Git repository.
-- A complete WordPress plugin directory structure.
-- A root `README.md`.
-- A suitable `.gitignore`.
-- Development configuration for PHP 8.1+.
-- A test structure.
-- Any minimal configuration files required by the chosen test tools.
-
-Never commit API keys, passwords, WordPress credentials, `.env` files, or generated private data.
-
-Before writing implementation code, inspect the new repository and report the proposed file structure. Then begin implementation immediately.
-
-## Product
-
-Build a production-quality MVP WordPress plugin called **The Runbook Briefings**.
-
-The plugin monitors approved RSS feeds, identifies useful hosting and WordPress security stories, creates original factual briefings, and saves them as WordPress drafts for editorial review.
-
-Suggested product positioning:
+The Runbook Briefings is a standalone WordPress plugin that turns approved hosting and WordPress security RSS stories into original, source-attributed briefings for editorial review.
 
 > Turn hosting news and security alerts into original, engineer-reviewed Runbook briefings.
 
-Do not call the product a spinner. Do not build a plagiarism tool or a low-quality article rewriting tool. The product must provide trustworthy, source-aware transformation with editorial control.
-
-## Core Workflow
-
-Implement this complete workflow:
-
-1. An administrator adds, edits, enables, disables, and deletes RSS feed sources.
-2. The plugin uses WordPress built-in SimplePie and RSS functions.
-3. A scheduled WP-Cron task fetches enabled feeds.
-4. The importer filters items by keywords, categories, source, and date.
-5. The importer normalizes URLs and detects duplicate stories.
-6. Imported items are saved with their source metadata and processing status.
-7. Imported items appear in a WordPress admin review queue.
-8. An editor opens an item and can:
-   - Generate a factual summary.
-   - Generate a suggested headline.
-   - Generate a "Why this matters" section.
-   - Generate practical implications for site owners.
-   - Generate related internal-link suggestions.
-   - Edit all generated content.
-   - Save the result as a WordPress draft.
-   - Dismiss the item.
-   - Retry a failed item.
-9. The plugin never publishes automatically by default.
-10. Every briefing includes source attribution and a link to the original source.
-
-The complete path must work:
-
-`add source -> import item -> detect duplicate status -> generate briefing -> edit briefing -> save WordPress draft -> verify attribution and source link`
-
-## Required Briefing Content
-
-Every generated briefing must include:
-
-- Original source name.
-- Original article title.
-- Publication date.
-- Source URL.
-- Attribution text.
-- Optional canonical link.
-- A factual summary.
-- Original Runbook analysis.
-- Practical implications for site owners.
-
-Never reproduce an entire source article. Store only permitted short excerpts, source metadata, summaries, and original commentary.
-
-## Content Quality Rules
-
-- Preserve factual accuracy.
-- Do not invent prices, dates, statistics, quotes, features, or claims.
-- Clearly distinguish source facts from Runbook commentary.
-- Use the source as background information, not as text to paraphrase line by line.
-- Do not reproduce more than a short permitted excerpt.
-- Generate original practical insight.
-- Use a tone suitable for technical hosting and WordPress readers.
-- Support technical, beginner-friendly, concise, and editorial tones.
-- Add a visible attribution block to every draft.
-- Fail safely when the source content is insufficient to support a claim.
-
-## Feed Management
-
-Provide admin controls for:
-
-- Feed name.
-- Feed URL.
-- Enabled or disabled status.
-- Keywords.
-- Categories.
-- Source reliability notes.
-- Last successful fetch.
-- Last error.
-- Import frequency.
-
-Validate feed URLs and use timeouts. Handle malformed feeds, unavailable sources, redirects, duplicate items, and temporary failures gracefully.
-
-## Settings
-
-Create a settings screen with:
-
-- AI provider.
-- API key stored securely in WordPress options.
-- Model name.
-- Default tone.
-- Maximum source excerpt length.
-- Cron frequency.
-- Default post status.
-- Maximum items processed per run.
-- Request timeout.
-- Retry limit.
-
-The plugin must still import feeds and support manual editing when no AI API key is configured.
-
-## AI Provider Architecture
-
-Create a provider interface so the first provider can use an OpenAI-compatible API while allowing additional providers later.
-
-The abstraction must handle:
-
-- Prompt construction.
-- Authentication.
-- Request timeouts.
-- Response parsing.
-- API errors.
-- Rate limits.
-- Retry limits.
-- Safe logging without secrets.
-
-Never expose API keys in HTML, JavaScript, REST responses, logs, debug output, or error messages.
-
-Do not use fake API responses as the final implementation. When no provider is configured, display a clear actionable message and preserve the manual workflow.
-
-## Admin Interface
+## What It Does
 
-Add a top-level **Content Briefings** admin menu with:
+```text
+RSS source -> filtering -> review queue -> original briefing -> editor approval -> WordPress draft
+```
 
-- Dashboard.
-- Sources.
-- Review Queue.
-- Settings.
-- Logs.
+The plugin deliberately does **not** auto-publish or copy complete source articles. It stores source metadata and a bounded plain-text excerpt, keeps facts separate from analysis, and adds a visible attribution block to every draft.
 
-Use normal WordPress admin UI conventions. Display statuses:
-
-- New.
-- Processing.
-- Drafted.
-- Published.
-- Dismissed.
-- Error.
-
-Include:
-
-- Useful empty states.
-- Actionable error messages.
-- Source health indicators.
-- Duplicate-confidence information.
-- Preview cards.
-- Retry controls.
-- Saved filters where practical.
-- Editorial notes.
-- Processing history.
-- Keyboard-accessible controls.
-
-Do not build a separate frontend dashboard unless it is required for the core WordPress workflow.
-
-## Security
-
-Protect every admin, REST, and AJAX action with:
-
-- `current_user_can()` checks.
-- Nonce verification.
-- Strict input validation.
-- Sanitization on input.
-- Escaping on output.
-- Safe database queries using WordPress APIs.
-- Safe feed URL handling.
-- Secure API credential handling.
-
-Do not log credentials or sensitive request headers. Add rate limiting and retry limits to external AI requests. Avoid SSRF risks when fetching user-supplied feed URLs by validating URLs and documenting the security tradeoffs.
-
-Support PHP 8.1+ and modern WordPress.
-
-## Data Model
-
-Define a clean schema for:
-
-- RSS sources.
-- Imported items.
-- Generated briefing data.
-- Processing status.
-- Error messages.
-- Timestamps.
-- Source attribution.
-- Duplicate relationships or confidence scores.
-- Linked WordPress draft ID.
-- Processing history.
-- Editorial notes.
-
-Use WordPress database APIs and prepared queries. Add indexes for fields used in duplicate detection and queue filtering.
-
-## REST and AJAX
-
-Use the WordPress REST API or secure admin AJAX endpoints for generation and queue actions. Protect every endpoint with capability checks, nonces where applicable, strict validation, and escaped responses.
-
-## Testing
-
-Create focused automated tests or testable helper functions for:
-
-- URL normalization.
-- Duplicate detection.
-- Title similarity.
-- Feed parsing.
-- Keyword filtering.
-- Category filtering.
-- Date filtering.
-- Excerpt length enforcement.
-- Prompt construction.
-- API error handling.
-- Retry limits.
-- Permission checks.
-- Nonce failures.
-- Draft creation.
-- Attribution output.
-- Malformed feed handling.
-
-## Scope Discipline And Ambition
-
-Build a genuinely useful, production-quality MVP. Demand complete implementation, not mockups, placeholder buttons, fake data, or a shallow demo.
-
-You may add polished, high-value features only when they directly improve this workflow:
-
-`RSS source -> filtering -> review queue -> original briefing -> editor approval -> WordPress draft`
-
-Good extras include:
-
-- Feed health indicators.
-- Preview cards.
-- Duplicate-confidence scores.
-- Saved filters.
-- Retry controls.
-- Source reliability ratings.
-- Editorial notes.
-- Processing history.
-- Internal-link recommendations.
-- Clear status badges.
-- Keyboard-friendly review actions.
-
-Do not add features merely because they sound impressive. Avoid:
-
-- Social feeds.
-- User accounts or SaaS billing.
-- Public-facing dashboards.
-- Complex analytics.
-- Automatic publishing.
-- Unrelated page builders.
-- Chatbots.
-- Gamification.
-- Decorative animations.
-- Multiple integrations before the core workflow works.
-
-Every extra feature must pass this test:
-
-1. Does it improve RSS discovery, editorial review, content quality, attribution, or draft creation?
-2. Can it be implemented without weakening security or reliability?
-3. Can it be tested?
-4. Does it fit within the current milestone?
-
-If the answer is no, record the idea under `Future Enhancements` and stay focused.
-
-## Milestones
-
-Do not move to the next milestone until the current milestone passes its checks.
-
-### Milestone 1: Repository And Scaffold
-
-- Create the repository.
-- Create the plugin structure.
-- Add the plugin bootstrap file.
-- Add activation and deactivation hooks.
-- Add coding and test configuration.
-- Verify activation without fatal errors.
-- Run PHP lint.
-
-### Milestone 2: Storage And Sources
-
-- Implement the data model.
-- Add source management.
-- Add validation and capability checks.
-- Add source health fields.
-- Add tests for storage and validation.
-- Run lint and tests.
-
-### Milestone 3: RSS Importer
-
-- Implement scheduled feed importing.
-- Add filtering.
-- Add URL normalization.
-- Add duplicate detection.
-- Add timeouts, retries, and errors.
-- Add importer tests.
-- Run lint and tests.
-
-### Milestone 4: Review Queue
-
-- Build the admin review queue.
-- Add statuses.
-- Add preview cards.
-- Add dismiss and retry actions.
-- Add editorial notes and processing history where practical.
-- Add permission and nonce checks.
-- Run lint and tests.
-
-### Milestone 5: AI Integration
-
-- Implement the provider interface.
-- Add settings.
-- Secure credentials.
-- Add prompt construction.
-- Add content quality constraints.
-- Handle missing credentials gracefully.
-- Add API failure tests.
-- Run lint and tests.
-
-### Milestone 6: Draft Creation
-
-- Generate briefing fields.
-- Add source attribution.
-- Add internal-link suggestions.
-- Allow editing before saving.
-- Create WordPress drafts only after editor action.
-- Run lint and tests.
-
-### Milestone 7: Hardening
-
-- Review permissions, nonces, validation, escaping, database queries, and external requests.
-- Confirm secrets never appear in logs or responses.
-- Test duplicate, malformed-feed, unavailable-source, and API-failure scenarios.
-- Run the complete test suite.
-
-### Milestone 8: Documentation And Packaging
-
-- Complete the root README.
-- Document installation and configuration.
-- Document adding feeds and configuring AI.
-- Document the editorial workflow.
-- Document privacy, API keys, copyright, and attribution safeguards.
-- Document WP-Cron setup.
-- Document troubleshooting.
-- Document testing.
-- Package the plugin for installation on a clean WordPress site.
-- Run PHP lint on every PHP file.
-- Run all available tests.
-
-## Rules For Working
-
-- Inspect before editing.
-- At the beginning of each milestone, state the files you plan to create or modify.
-- Implement the current milestone before discussing the next one.
-- Do not stop after creating the basic skeleton.
-- If a check fails, repair the current milestone and rerun the same check.
-- Keep dependencies minimal and explain every external dependency.
-- Do not modify unrelated projects.
-- Do not add a theme redesign.
-- Do not auto-publish content.
-- Do not copy complete source articles.
-- Report changed files, commands run, test results, and known limitations at the end of each milestone.
-
-## Definition Of Done
-
-The project is complete only when:
-
-- The repository is initialized and documented.
-- The plugin activates cleanly on a fresh WordPress installation.
-- RSS sources can be managed from the admin area.
-- Feeds import on schedule.
-- Duplicate stories are filtered.
-- Imported stories appear in a review queue.
-- Editors can generate or manually write briefings.
-- Briefings retain attribution and source URLs.
-- Editors can save approved briefings as drafts.
-- No content is auto-published by default.
-- API keys are protected.
-- Permissions and nonces are enforced.
-- PHP lint passes.
-- Tests pass, or unavailable tests are documented with a reason.
-- Installation, configuration, privacy, copyright, and troubleshooting documentation is complete.
-- The complete real test path has been demonstrated from feed source to WordPress draft.
+### Included features
+
+- Add, edit, enable, disable, and delete RSS feed sources in WordPress admin.
+- Filter each source by keywords and feed categories.
+- Apply a global item-age window and per-run import limit.
+- Fetch enabled feeds with WordPress `fetch_feed()`/SimplePie on WP-Cron or on demand.
+- Validate public HTTP(S) feed URLs, limit redirects and timeouts, and reject unsafe requests.
+- Normalize article URLs and detect exact URL and probable title duplicates.
+- Review imported items with status, source health, duplicate confidence, editorial notes, and processing history.
+- Generate a structured headline, factual summary, “Why this matters,” practical implications, and internal-link suggestions through an OpenAI-compatible provider.
+- Continue the full manual editing workflow when AI is disabled or no key is configured.
+- Create or update a WordPress draft/pending post only after an editor explicitly requests it.
+- Preserve source name, original title, publication date, source URL, canonical metadata, and visible attribution.
+- Encrypt API keys at rest using authenticated encryption derived from WordPress salts.
+- Record bounded, credential-redacted operational logs.
+
+## Requirements
+
+- WordPress 6.4 or newer.
+- PHP 8.1 or newer.
+- HTTPS is strongly recommended for WordPress admin.
+- PHP Sodium or OpenSSL when an AI key will be stored. Manual mode does not require either extension.
+- A working WP-Cron setup, or a system scheduler that calls `wp-cron.php`.
+
+No production PHP packages or JavaScript frameworks are required.
+
+## Installation
+
+### From the installable ZIP
+
+1. Build or download `the-runbook-briefings-1.0.0.zip`.
+2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**.
+3. Upload the ZIP, install it, and activate **The Runbook Briefings**.
+4. Open **Content Briefings → Settings** and review the defaults.
+5. Open **Content Briefings → Sources** and add an approved public RSS feed.
+
+### From this repository
+
+Copy the `the-runbook-briefings` directory into `wp-content/plugins/`:
+
+```bash
+cp -R the-runbook-briefings /path/to/wordpress/wp-content/plugins/
+```
+
+Then activate it in WordPress admin or with WP-CLI:
+
+```bash
+wp plugin activate the-runbook-briefings
+```
+
+Activation creates four prefixed tables for sources, imported items, processing history, and logs; adds the `review_runbook_briefings` capability to administrators and editors; and schedules the importer. Deactivation clears the schedule but retains editorial data. Uninstall retains data by default unless **Delete plugin tables and settings when the plugin is uninstalled** was enabled first.
+
+## Configuration
+
+Open **Content Briefings → Settings**.
+
+### AI provider
+
+- **Provider:** OpenAI-compatible or disabled/manual-only.
+- **API key:** enter a new key to save or replace it. The key is never redisplayed.
+- **Model:** model identifier accepted by the provider; default `gpt-4o-mini`.
+- **Default tone:** technical, beginner-friendly, concise, or editorial.
+- **Retry limit / timeout:** bounds external requests.
+
+The built-in provider uses `https://api.openai.com/v1/chat/completions`. A trusted developer can point the same provider abstraction at another compatible HTTPS endpoint:
+
+```php
+add_filter(
+    'trb_openai_endpoint',
+    static fn (): string => 'https://trusted-provider.example/v1/chat/completions'
+);
+```
+
+Do not accept an endpoint from an untrusted user. WordPress safe HTTP APIs and HTTPS validation are still applied.
+
+### Import and draft safeguards
+
+- **Maximum source excerpt characters:** 100–5,000; default 1,200.
+- **Cron frequency:** every 15 minutes, hourly, twice daily, or daily.
+- **Default post status:** draft or pending review. `publish` is not accepted.
+- **Maximum new items per run:** 1–100.
+- **Maximum item age:** 1–365 days.
+- **Request timeout:** 5–60 seconds.
+
+## Adding Feeds
+
+1. Open **Content Briefings → Sources**.
+2. Enter a descriptive source name and public HTTP(S) RSS/Atom URL.
+3. Optionally enter comma- or newline-delimited keywords. An item passes when any keyword appears in its title or short description.
+4. Optionally enter feed category labels. An item passes when any configured category matches.
+5. Add reliability/editorial notes and select a frequency.
+6. Save the source, then use **Run import now** on the dashboard.
+
+Private, loopback, local, malformed, and non-HTTP feed addresses are rejected through WordPress URL validation. Redirects are limited to three. A successful fetch updates source health even when every item is filtered.
+
+## Editorial Workflow
+
+1. Open **Content Briefings → Review Queue**.
+2. Filter by status or source and open an item.
+3. Verify the original title, source URL, publication time, and bounded excerpt.
+4. Either write fields manually or choose **Generate suggestions**.
+5. Verify every generated statement against the source. AI output is a suggestion, not an approval.
+6. Edit the headline, factual summary, Runbook analysis, implications, local link suggestions, and private notes.
+7. Choose **Save changes** to remain in the queue, or **Save as WordPress draft**.
+8. Continue normal WordPress editing and publishing outside the plugin.
+
+The generated post contains separate “What happened,” “Why this matters,” and practical-implications sections, optional validated local links, and a visible source-attribution block. The source metadata is also stored as protected post meta.
+
+### Statuses
+
+- **New:** ready for editorial work (including generated suggestions awaiting review).
+- **Processing:** an AI request is active.
+- **Drafted:** linked to a draft or pending WordPress post.
+- **Published:** the linked post was later published through normal WordPress controls.
+- **Dismissed:** removed from the active workflow or marked as a probable duplicate.
+- **Error:** a provider or processing action failed and can be retried.
+
+## Duplicate Detection
+
+Exact duplicate detection hashes a normalized URL after standardizing scheme/host/path/query order and removing common tracking parameters. Probable duplicates compare normalized meaningful title tokens against recent imported items. Probable title duplicates are retained for auditability, linked to the earlier item with a confidence score, and initially dismissed. An editor can return one to the queue.
+
+The similarity threshold can be adjusted cautiously:
+
+```php
+add_filter( 'trb_duplicate_title_threshold', static fn (): float => 0.90 );
+```
+
+## Security and Privacy
+
+- Source/settings actions require `manage_options`; queue actions require the plugin review capability.
+- Every write action verifies a user-specific WordPress nonce.
+- Input is validated and sanitized; output is escaped; database access uses WordPress APIs and prepared SQL.
+- Feed and AI requests use safe WordPress HTTP functions, strict timeouts, limited redirects/retries, and safe-URL validation.
+- API keys are encrypted with Sodium `secretbox` or OpenSSL AES-256-GCM. The encryption key is derived from WordPress authentication salts and is not stored in the plugin tables.
+- Keys are never placed in generated HTML, browser JavaScript, REST output, notices, or logs.
+- Log context redacts credential-like fields and bearer/key patterns; records are pruned after 90 days.
+- AI requests contain source metadata, the configured short excerpt, tone, and a small list of existing internal-link candidates. They do not contain complete source articles.
+
+Your AI provider processes submitted prompt data under its own terms and privacy policy. Site operators are responsible for obtaining appropriate agreements and informing editors. The plugin does not send data to an AI provider until an editor explicitly clicks **Generate suggestions**.
+
+## Copyright and Attribution Safeguards
+
+The plugin is designed for source-aware editorial transformation, not article spinning:
+
+- It does not fetch or store complete article bodies.
+- Imported excerpts are converted to plain text and hard-limited.
+- Prompts prohibit unsupported facts, line-by-line rewriting, and source reconstruction.
+- Source facts and original analysis have separate fields and headings.
+- Attribution is application-generated from stored source metadata, not entrusted to AI output.
+- Draft creation requires editor action and leaves publication to normal WordPress controls.
+
+Feed availability does not itself grant republication rights. Configure excerpt limits and source usage according to applicable licenses, permissions, and law.
+
+## WP-Cron
+
+WordPress Cron is traffic-driven. On low-traffic or production sites, disable the built-in runner only after adding a real scheduler:
+
+```php
+define( 'DISABLE_WP_CRON', true );
+```
+
+Example system cron (every five minutes):
+
+```cron
+*/5 * * * * curl -fsS https://example.com/wp-cron.php?doing_wp_cron >/dev/null 2>&1
+```
+
+Or with WP-CLI:
+
+```cron
+*/5 * * * * cd /var/www/html && wp cron event run --due-now --quiet
+```
+
+The plugin uses an overlap lock and each source’s due time. A per-source frequency cannot run more often than the global cron event itself.
+
+## Development and Testing
+
+Install development dependencies:
+
+```bash
+composer install
+```
+
+Run syntax checks and unit tests:
+
+```bash
+composer lint
+composer test
+```
+
+The dependency-free focused suite covers URL normalization, title similarity, keyword/category/date filtering, excerpt limits, prompt and response handling, credential encryption, capability/nonce enforcement, internal-link validation, attribution, and draft construction. Equivalent PHPUnit test cases are included for teams that use PHPUnit in their development workflow (`composer test:phpunit`).
+
+For a clean-site smoke test:
+
+```bash
+wp plugin activate the-runbook-briefings
+wp cron event list --fields=hook,next_run_relative | grep trb_import_feeds
+wp option get trb_db_version
+```
+
+Then exercise the real path in admin:
+
+```text
+add source -> import -> inspect duplicate status -> edit/generate -> save draft -> verify attribution
+```
+
+No real provider call is made by automated tests. Provider response parsing and failure handling are tested locally; a live call requires the operator’s own account and incurs provider charges.
+
+## Packaging
+
+Run:
+
+```bash
+./bin/package.sh
+```
+
+The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.0.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
+
+## Troubleshooting
+
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for feed, cron, provider, permissions, encryption, duplicate, and draft issues.
+
+## Known Limitations
+
+- The MVP supports one OpenAI-compatible chat-completions provider implementation; the interface is ready for additional providers.
+- Source filtering is allow-list based (“match any”) rather than a Boolean query language.
+- Title similarity is heuristic and intentionally leaves probable duplicates recoverable.
+- Internal-link candidates are drawn from the 20 most recent published posts; editors can enter other local links manually.
+- WP-Cron timing depends on site traffic unless a system scheduler is configured.
+- Factual quality still requires a human editor; a short feed excerpt may be insufficient for some stories.
+
+## License
+
+GPL-2.0-or-later. See [LICENSE](LICENSE).

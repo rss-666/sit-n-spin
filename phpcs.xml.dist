@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset name="The Runbook Briefings">
+    <description>WordPress coding standards for The Runbook Briefings.</description>
+    <file>the-runbook-briefings</file>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <arg name="extensions" value="php"/>
+    <rule ref="WordPress"/>
+    <rule ref="WordPress-Docs"/>
+    <config name="minimum_supported_wp_version" value="6.4"/>
+    <config name="testVersion" value="8.1-"/>
+</ruleset>
