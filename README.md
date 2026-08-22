@@ -220,6 +220,8 @@ The plugin uses an overlap lock and each source’s due time. A per-source frequ
 
 ## Development and Testing
 
+For hands-on WordPress acceptance testing, open [`runbook-plugin-test-checklist.html`](runbook-plugin-test-checklist.html) in a browser. The interactive checklist autosaves locally, tracks Pass/Fail/Blocked/Skipped results, includes known-good RSS feeds, and generates a Markdown report that can be pasted back into an Arena conversation. Do not enter credentials or private customer data in the checklist.
+
 Install development dependencies:
 
 ```bash

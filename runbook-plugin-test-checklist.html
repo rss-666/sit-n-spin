@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>The Runbook Briefings — Interactive Plugin Test Checklist</title>
+  <style>
+    :root {
+      --bg: #080b10;
+      --panel: #111721;
+      --panel-2: #171f2c;
+      --line: #2b3647;
+      --text: #edf2f8;
+      --muted: #9eabba;
+      --accent: #8b6cff;
+      --accent-2: #38d6c5;
+      --pass: #3ddc97;
+      --fail: #ff6577;
+      --blocked: #ffbd59;
+      --skip: #8290a3;
+      --focus: #bdaeff;
+      --shadow: 0 20px 55px rgba(0, 0, 0, .32);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(139, 108, 255, .16), transparent 32rem),
+        radial-gradient(circle at 88% 12%, rgba(56, 214, 197, .1), transparent 30rem),
+        var(--bg);
+      color: var(--text);
+      font: 15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, select, input, textarea { border-radius: 8px; }
+    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+      outline: 3px solid var(--focus); outline-offset: 2px;
+    }
+    a { color: #c7bbff; }
+    code { color: #bcece7; overflow-wrap: anywhere; }
+    .shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 34px 0 80px; }
+    .hero {
+      display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 24px;
+      align-items: end; padding: clamp(24px, 5vw, 50px); border: 1px solid var(--line);
+      border-radius: 22px; background: linear-gradient(145deg, rgba(23,31,44,.96), rgba(13,18,27,.96)); box-shadow: var(--shadow);
+    }
+    .eyebrow { color: var(--accent-2); font-weight: 800; letter-spacing: .13em; text-transform: uppercase; font-size: 12px; }
+    h1 { font-size: clamp(2rem, 6vw, 4.6rem); line-height: .98; letter-spacing: -.055em; margin: 10px 0 18px; max-width: 820px; }
+    h2 { font-size: clamp(1.35rem, 3vw, 2rem); letter-spacing: -.025em; margin: 0; }
+    h3 { margin: 0; font-size: 1rem; }
+    .hero p { color: var(--muted); font-size: 1.05rem; max-width: 760px; margin: 0; }
+    .privacy { margin-top: 15px !important; padding-left: 14px; border-left: 3px solid var(--accent-2); font-size: .9rem !important; }
+    .progress-card { background: rgba(8,11,16,.65); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+    .progress-line { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+    .progress-line strong { font-size: 2rem; }
+    .track { height: 10px; border-radius: 99px; overflow: hidden; background: #283243; margin: 12px 0; }
+    .bar { width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .25s ease; }
+    .summary-mini { color: var(--muted); font-size: .86rem; }
+    .panel { margin-top: 22px; border: 1px solid var(--line); border-radius: 18px; background: rgba(17,23,33,.93); box-shadow: var(--shadow); }
+    .panel-head { padding: 20px 22px; border-bottom: 1px solid var(--line); }
+    .panel-head p { color: var(--muted); margin: 5px 0 0; }
+    .panel-body { padding: 22px; }
+    .environment { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    label span { display: block; color: var(--muted); font-size: .82rem; font-weight: 700; margin-bottom: 5px; }
+    input, textarea, select {
+      width: 100%; border: 1px solid var(--line); background: #0b1018; color: var(--text); padding: 10px 11px;
+    }
+    textarea { min-height: 84px; resize: vertical; }
+    .feed-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .feed { border: 1px solid var(--line); background: var(--panel-2); border-radius: 12px; padding: 15px; }
+    .feed-primary { border-color: rgba(56,214,197,.55); }
+    .feed p { color: var(--muted); margin: 6px 0 10px; }
+    .feed-line { display: flex; align-items: center; gap: 8px; }
+    .feed-line code { flex: 1; font-size: .8rem; }
+    .button, button {
+      appearance: none; border: 1px solid var(--line); background: #222c3c; color: var(--text); cursor: pointer;
+      padding: 9px 13px; font-weight: 750; transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    button:hover { transform: translateY(-1px); border-color: #64738a; }
+    .button-primary { background: linear-gradient(135deg, #7454f5, #987cff); border-color: transparent; }
+    .button-danger { color: #ff9ca8; }
+    .button-small { padding: 5px 9px; font-size: .78rem; }
+    .sticky-tools {
+      position: sticky; top: 10px; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
+      margin: 22px 0; padding: 12px; border: 1px solid var(--line); background: rgba(11,16,24,.92);
+      backdrop-filter: blur(14px); border-radius: 14px; box-shadow: var(--shadow);
+    }
+    .sticky-tools .spacer { flex: 1; }
+    .filter-button[aria-pressed="true"] { border-color: var(--accent); background: rgba(139,108,255,.2); }
+    .section { margin: 25px 0; }
+    .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+    .section-number { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(139,108,255,.18); color: #c8bdff; font-weight: 850; }
+    .test-list { display: grid; gap: 9px; }
+    .test {
+      border: 1px solid var(--line); background: rgba(17,23,33,.92); border-radius: 13px; overflow: hidden;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .test[data-status="pass"] { border-left: 4px solid var(--pass); }
+    .test[data-status="fail"] { border-left: 4px solid var(--fail); background: rgba(255,101,119,.055); }
+    .test[data-status="blocked"] { border-left: 4px solid var(--blocked); }
+    .test[data-status="skipped"] { border-left: 4px solid var(--skip); opacity: .78; }
+    .test-main { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 15px; padding: 15px 16px; align-items: center; }
+    .test-title { display: flex; align-items: flex-start; gap: 9px; }
+    .optional { display: inline-block; color: var(--blocked); border: 1px solid rgba(255,189,89,.35); padding: 1px 6px; border-radius: 99px; font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+    .test-summary { color: var(--muted); font-size: .88rem; margin: 4px 0 0; }
+    .test-status { font-weight: 800; }
+    .test-status.status-pass { border-color: var(--pass); }
+    .test-status.status-fail { border-color: var(--fail); }
+    .test-status.status-blocked { border-color: var(--blocked); }
+    details { border-top: 1px solid var(--line); }
+    summary { color: #c4cfdb; cursor: pointer; padding: 9px 16px; font-size: .86rem; user-select: none; }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 4px 16px 16px; }
+    .instructions { background: #0b1018; border-radius: 9px; padding: 12px; color: var(--muted); }
+    .instructions strong { color: var(--text); display: block; margin-bottom: 5px; }
+    .instructions ol { padding-left: 18px; margin: 5px 0 0; }
+    .notes label { display: block; color: var(--text); font-weight: 750; margin-bottom: 5px; }
+    .notes textarea { min-height: 115px; }
+    .report-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 15px; }
+    .report-preview { white-space: pre-wrap; overflow-wrap: anywhere; min-height: 220px; max-height: 540px; overflow: auto; background: #080c12; border: 1px solid var(--line); border-radius: 10px; padding: 16px; color: #d8e2ec; font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .overall { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .toast { position: fixed; right: 18px; bottom: 18px; background: #f3f7fb; color: #111820; border-radius: 10px; padding: 11px 15px; box-shadow: var(--shadow); opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s ease; z-index: 50; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .hidden { display: none !important; }
+    footer { color: var(--muted); text-align: center; margin-top: 28px; font-size: .86rem; }
+    @media (max-width: 800px) {
+      .hero, .environment, .feed-grid, .overall { grid-template-columns: 1fr; }
+      .test-main { grid-template-columns: 1fr; }
+      .details-grid { grid-template-columns: 1fr; }
+      .sticky-tools { top: 4px; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .shell { width: 100%; padding: 0; }
+      .hero, .panel, .test { box-shadow: none; background: #fff; color: #111; border-color: #bbb; }
+      .sticky-tools, .report-actions, .feed-grid, footer { display: none; }
+      .test-summary, .panel-head p, .hero p, label span { color: #444; }
+      details { display: block; }
+      details > * { display: block; }
+      textarea, input, select { color: #111; background: #fff; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Interactive QA worksheet</div>
+        <h1>The Runbook Briefings</h1>
+        <p>Test the WordPress plugin one workflow at a time. Mark each check, record the exact behavior, then copy the generated report back into Arena.</p>
+        <p class="privacy"><strong>Privacy:</strong> this file runs locally and autosaves only in your browser. Never enter passwords, API keys, cookies, or private customer data.</p>
+      </div>
+      <div class="progress-card" aria-live="polite">
+        <div class="progress-line"><span>Checklist progress</span><strong id="progress-percent">0%</strong></div>
+        <div class="track"><div class="bar" id="progress-bar"></div></div>
+        <div class="summary-mini" id="summary-mini">0 of 0 checks recorded</div>
+      </div>
+    </section>
+
+    <section class="panel" id="environment-panel">
+      <header class="panel-head"><h2>Test environment</h2><p>These details make failures reproducible. Approximate versions are fine.</p></header>
+      <div class="panel-body environment">
+        <label><span>Tester name</span><input data-env="tester" autocomplete="name" placeholder="Your name or handle"></label>
+        <label><span>Site URL (no admin path)</span><input data-env="site" type="url" placeholder="https://example.com"></label>
+        <label><span>Test date</span><input data-env="date" type="date"></label>
+        <label><span>WordPress version</span><input data-env="wordpress" placeholder="Example: 6.8.2"></label>
+        <label><span>PHP version</span><input data-env="php" placeholder="Example: 8.3"></label>
+        <label><span>Plugin version</span><input data-env="plugin" value="1.0.0"></label>
+        <label><span>Browser/device</span><input data-env="browser" placeholder="Chrome on Windows 11"></label>
+        <label><span>Active theme</span><input data-env="theme" placeholder="Theme name"></label>
+        <label><span>Hosting/cache/security notes</span><input data-env="stack" placeholder="cPanel, Cloudflare, security plugins…"></label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel-head"><h2>Known-good RSS feeds</h2><p>Start with WordPress.org Security and leave source filters blank for the first run.</p></header>
+      <div class="panel-body feed-grid" id="feed-grid"></div>
+    </section>
+
+    <nav class="sticky-tools" aria-label="Checklist controls">
+      <button class="filter-button" data-filter="all" aria-pressed="true">All</button>
+      <button class="filter-button" data-filter="untested" aria-pressed="false">Untested</button>
+      <button class="filter-button" data-filter="fail" aria-pressed="false">Failures</button>
+      <button class="filter-button" data-filter="blocked" aria-pressed="false">Blocked</button>
+      <span class="spacer"></span>
+      <button id="expand-problems">Open problem notes</button>
+      <button id="jump-report" class="button-primary">Build report</button>
+    </nav>
+
+    <div id="checklist"></div>
+
+    <section class="panel" id="report-panel">
+      <header class="panel-head"><h2>Report back</h2><p>Generate a report, copy it, and paste it into the Arena conversation. Failed and blocked checks are highlighted first.</p></header>
+      <div class="panel-body">
+        <div class="overall">
+          <label><span>Overall result</span><select data-env="overall"><option value="Testing in progress">Testing in progress</option><option value="Ready for staging">Ready for staging</option><option value="Needs fixes">Needs fixes</option><option value="Blocked">Blocked</option></select></label>
+          <label><span>Overall notes</span><textarea data-env="overallNotes" placeholder="Anything that did not fit a specific check…"></textarea></label>
+        </div>
+        <div class="report-actions">
+          <button class="button-primary" id="copy-report">Copy report for Arena</button>
+          <button id="download-report">Download Markdown report</button>
+          <button id="export-json">Export progress JSON</button>
+          <button id="import-json">Import progress JSON</button>
+          <button id="print-report">Print</button>
+          <button class="button-danger" id="reset-all">Reset checklist</button>
+          <input class="hidden" id="json-file" type="file" accept="application/json,.json">
+        </div>
+        <pre class="report-preview" id="report-preview" tabindex="0">Your generated report will appear here.</pre>
+      </div>
+    </section>
+    <footer>Runbook QA data stays in this browser unless you copy or export it.</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    const feeds = [
+      { name: 'WordPress.org Security', url: 'https://wordpress.org/news/category/security/feed/', note: 'Recommended first test: official security releases and notices.', primary: true },
+      { name: 'Wordfence Security', url: 'https://www.wordfence.com/blog/feed/', note: 'Higher-volume vulnerability and malware reporting.' },
+      { name: 'Sucuri Security Blog', url: 'https://blog.sucuri.net/feed', note: 'Website security, hardening, malware, and patch roundups.' },
+      { name: 'WordPress News', url: 'https://wordpress.org/news/feed/', note: 'Official general WordPress and release news.' },
+      { name: 'WP Tavern', url: 'https://wptavern.com/feed', note: 'Broad ecosystem stories, products, and interviews.' }
+    ];
+
+    const sections = [
+      { title: 'Installation and navigation', tests: [
+        { id: 'install-upload', title: 'Installable ZIP is accepted', summary: 'WordPress installs the archive without an incompatible/corrupt archive error.', steps: ['Upload the current compatibility ZIP under Plugins → Add New Plugin.', 'Choose Install Now.'], expected: 'WordPress extracts one the-runbook-briefings folder and shows an installation success message.' },
+        { id: 'install-activate', title: 'Plugin activates cleanly', summary: 'Activation completes with no fatal error or recovery-mode email.', steps: ['Activate The Runbook Briefings.', 'Refresh the Plugins screen.'], expected: 'The plugin remains active and the site/admin continue loading normally.' },
+        { id: 'admin-menu', title: 'All admin screens are available', summary: 'Dashboard, Sources, Review Queue, Settings, and Logs open.', steps: ['Open the Content Briefings menu.', 'Visit every submenu.'], expected: 'Every screen loads without warnings, blank pages, or permission errors for an administrator.' }
+      ]},
+      { title: 'Settings and safeguards', tests: [
+        { id: 'settings-manual', title: 'Manual-only settings save', summary: 'Settings work without an AI key.', steps: ['Set Provider to Disabled / manual only.', 'Keep post status Draft.', 'Save settings.'], expected: 'A success notice appears and values remain after refresh.' },
+        { id: 'settings-no-publish', title: 'Automatic publish is unavailable', summary: 'Only Draft or Pending Review can be selected.', steps: ['Inspect Default post status.', 'Save each allowed status once if desired.'], expected: 'There is no Publish option and submitted invalid values cannot enable auto-publishing.' },
+        { id: 'settings-key', title: 'API key remains hidden after saving', summary: 'Optional provider credential test.', optional: true, steps: ['Only if ready to test AI, enter a valid provider key and save.', 'Reload Settings and inspect the page source only if comfortable.'], expected: 'The key is never redisplayed in the input, HTML, notices, or Logs. Do not put the key in these checklist notes.' }
+      ]},
+      { title: 'RSS source management', tests: [
+        { id: 'source-add', title: 'Add the official security feed', summary: 'A valid public feed can be saved.', steps: ['Name it WordPress.org Security.', 'Use https://wordpress.org/news/category/security/feed/.', 'Leave Keywords and Categories blank; enable it and save.'], expected: 'The source appears in the configured sources table with Not fetched or Healthy status.' },
+        { id: 'source-edit', title: 'Edit, disable, and re-enable a source', summary: 'Source controls persist correctly.', steps: ['Add a reliability note and save.', 'Disable the source, refresh, then re-enable it.'], expected: 'Name, URL, notes, frequency, and enabled state persist after each refresh.' },
+        { id: 'source-unsafe', title: 'Unsafe/local feed URL is rejected', summary: 'SSRF-oriented validation blocks local addresses.', steps: ['Try adding http://127.0.0.1/feed.xml or http://localhost/feed/.'], expected: 'The source is rejected with an actionable public-URL validation message.' },
+        { id: 'source-duplicate', title: 'Duplicate feed URL is rejected', summary: 'The same source cannot be configured twice.', steps: ['Try adding the exact official security feed URL a second time.'], expected: 'The duplicate source is not created and a useful notice appears.' }
+      ]},
+      { title: 'Importing, filtering, and duplicates', tests: [
+        { id: 'import-manual', title: 'Manual import completes', summary: 'Run import now fetches the enabled source.', steps: ['Open Content Briefings → Dashboard.', 'Choose Run import now.', 'Wait for the result notice.'], expected: 'The result reports new/duplicate/error counts; source health shows a successful fetch.' },
+        { id: 'import-queue', title: 'Recent stories enter the queue', summary: 'Valid items are stored with bounded excerpts.', steps: ['Open Review Queue.', 'Open one imported item.'], expected: 'Recent stories appear as New with source, date, URL, title, category metadata, and a short—not complete—excerpt.' },
+        { id: 'import-keyword', title: 'Keyword filtering works', summary: 'Only matching titles/descriptions are imported.', steps: ['Use a fresh source or dismiss current test items.', 'Set keywords such as vulnerability, security, patch.', 'Import again when the feed has unseen items.'], expected: 'Items matching any configured keyword pass; unrelated unseen items do not.' },
+        { id: 'import-duplicate', title: 'Second import detects duplicates', summary: 'Re-importing does not create another active item.', steps: ['Run the same enabled feed again without changing it.', 'Inspect the notice, queue, and dismissed items.'], expected: 'Identical normalized URLs are skipped and probable title duplicates are linked/dismissed rather than duplicated as New.' },
+        { id: 'import-bad-feed', title: 'Malformed/unavailable feed fails safely', summary: 'Optional failure/recovery test.', optional: true, steps: ['Add a public URL you control that returns malformed XML or a temporary error.', 'Run an import.'], expected: 'The site remains operational; source health and Logs show a bounded error that does not expose sensitive data.' }
+      ]},
+      { title: 'Review queue workflow', tests: [
+        { id: 'queue-filters', title: 'Queue filters and search work', summary: 'Status, source, and search narrow the list.', steps: ['Try status and source filters.', 'Search for part of an imported title.', 'Clear filters.'], expected: 'Results update correctly and empty states explain what to do.' },
+        { id: 'queue-source', title: 'Source details and attribution preview are correct', summary: 'The original story remains traceable.', steps: ['Open a New item.', 'Compare source name, title, date, URL, and excerpt to the feed article.'], expected: 'Metadata is correct, the original link opens safely, and attribution preview is visible.' },
+        { id: 'queue-notes', title: 'Manual fields and editorial notes persist', summary: 'Editing without AI works.', steps: ['Enter a headline, factual summary, analysis, implications, and private note.', 'Choose Save changes and reload.'], expected: 'All fields persist; the private editorial note is clearly separate from draft content.' },
+        { id: 'queue-dismiss', title: 'Dismiss and return-to-queue actions work', summary: 'Editors can remove and recover an item.', steps: ['Dismiss a disposable item.', 'Filter to Dismissed, open it, and return it to the queue.'], expected: 'Status and processing history record both transitions.' },
+        { id: 'queue-no-ai', title: 'Generate fails gracefully without AI configuration', summary: 'Manual work is not lost.', steps: ['With AI disabled/no key, enter a private note or manual text.', 'Choose Generate suggestions.'], expected: 'An actionable configuration message appears; existing manual fields remain available.' }
+      ]},
+      { title: 'AI generation (optional)', tests: [
+        { id: 'ai-generate', title: 'Provider returns editable structured suggestions', summary: 'Requires your own provider key and may incur charges.', optional: true, steps: ['Configure a supported key/model.', 'Open a suitable item and choose Generate suggestions.'], expected: 'Headline, factual summary, Why this matters, implications, and zero-to-three internal links populate for review; nothing publishes.' },
+        { id: 'ai-links', title: 'Invented external internal-links are not retained', summary: 'Generated links stay within offered local candidates.', optional: true, steps: ['Inspect all generated internal-link URLs.', 'Edit the lines and try an external hostname.'], expected: 'Provider links use existing supplied local URLs; manually entered external hosts are discarded on save.' },
+        { id: 'ai-error', title: 'Provider error is recoverable', summary: 'Bad auth/rate-limit failures create useful status.', optional: true, steps: ['Use a controlled invalid key or encounter a provider error.', 'Inspect item status and Logs, then retry after correcting settings.'], expected: 'The item becomes Error with a safe message, no key is logged, and Return to queue/Generate can recover it.' }
+      ]},
+      { title: 'WordPress draft creation', tests: [
+        { id: 'draft-summary', title: 'Draft requires a factual summary', summary: 'Empty content cannot create a misleading draft.', steps: ['Clear the factual summary on a disposable item.', 'Choose Save as WordPress draft.'], expected: 'Draft creation is refused with a clear message.' },
+        { id: 'draft-create', title: 'Editor action creates a draft only', summary: 'No automatic publication occurs.', steps: ['Add a factual summary and the other desired fields.', 'Choose Save as WordPress draft.', 'Open the linked WordPress post.'], expected: 'A normal post exists with Draft or Pending status according to settings—never Published.' },
+        { id: 'draft-content', title: 'Draft sections and attribution are complete', summary: 'Facts, analysis, implications, and source remain distinct.', steps: ['Inspect the linked post title/content.', 'Follow the source link.'], expected: 'The post contains What happened, Why this matters, practical implications, optional related reading, and visible source name/title/date/URL attribution.' },
+        { id: 'draft-update', title: 'Saving again updates the linked draft', summary: 'Repeated editor action does not create duplicate posts.', steps: ['Change a briefing field.', 'Choose Save as WordPress draft again.', 'Inspect Posts.'], expected: 'The existing linked post is updated; no second post is created.' },
+        { id: 'draft-published-status', title: 'Queue tracks later WordPress publication', summary: 'Normal WordPress publishing updates queue status.', steps: ['Publish a disposable linked post using normal WordPress controls.', 'Return to Review Queue.'], expected: 'The linked item displays Published. The plugin itself did not perform the publish action.' }
+      ]},
+      { title: 'Permissions, scheduling, and logs', tests: [
+        { id: 'role-editor', title: 'Editor can review but not manage settings', summary: 'Role boundaries match the editorial workflow.', optional: true, steps: ['Sign in as an Editor test user.', 'Open Content Briefings and attempt queue/settings access.'], expected: 'Editor can review items and drafts but cannot manage Sources, Settings, or Logs.' },
+        { id: 'role-subscriber', title: 'Subscriber cannot access plugin admin actions', summary: 'Low-privilege users are denied.', optional: true, steps: ['Sign in as a Subscriber test user.', 'Try direct plugin admin URLs if appropriate.'], expected: 'Menus are absent and direct access/actions are denied.' },
+        { id: 'cron-event', title: 'Importer cron event is scheduled', summary: 'Configured frequency has a future run.', optional: true, steps: ['Use a cron-inspection plugin or WP-CLI: wp cron event list.', 'Find trb_import_feeds.'], expected: 'Exactly one event exists using the configured recurrence.' },
+        { id: 'logs-safe', title: 'Logs are useful and contain no secrets', summary: 'Operational events provide safe diagnostics.', steps: ['Open Content Briefings → Logs after imports and any errors.', 'Search visually for keys/tokens you configured—do not paste them here.'], expected: 'Import/generation events are understandable; authorization headers and provider credentials never appear.' },
+        { id: 'reactivation', title: 'Deactivate/reactivate retains editorial data', summary: 'Lifecycle hooks do not destroy work.', optional: true, steps: ['Back up first.', 'Deactivate, verify the site loads, then reactivate.', 'Inspect sources and queue.'], expected: 'Sources/items remain, the plugin reactivates cleanly, and cron scheduling resumes.' }
+      ]}
+    ];
+
+    const STORAGE_KEY = 'runbook-briefings-qa-v1';
+    const allTests = sections.flatMap(section => section.tests.map(test => ({ ...test, section: section.title })));
+    const defaultState = () => ({
+      environment: { tester: '', site: '', date: new Date().toISOString().slice(0, 10), wordpress: '', php: '', plugin: '1.0.0', browser: '', theme: '', stack: '', overall: 'Testing in progress', overallNotes: '' },
+      results: Object.fromEntries(allTests.map(test => [test.id, { status: '', notes: '' }])),
+      startedAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+    });
+    let state = loadState();
+    let activeFilter = 'all';
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!saved || typeof saved !== 'object') return defaultState();
+        const fresh = defaultState();
+        return {
+          ...fresh,
+          ...saved,
+          environment: { ...fresh.environment, ...(saved.environment || {}) },
+          results: { ...fresh.results, ...(saved.results || {}) }
+        };
+      } catch (_) { return defaultState(); }
+    }
+
+    function saveState() {
+      state.updatedAt = new Date().toISOString();
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) { toast('Could not autosave in this browser. Export JSON as a backup.'); }
+      updateProgress();
+      updateReport();
+    }
+
+    function renderFeeds() {
+      const grid = document.getElementById('feed-grid');
+      feeds.forEach(feed => {
+        const card = document.createElement('article');
+        card.className = `feed${feed.primary ? ' feed-primary' : ''}`;
+        card.innerHTML = `<h3>${feed.name}${feed.primary ? ' · Start here' : ''}</h3><p>${feed.note}</p><div class="feed-line"><code>${feed.url}</code><button class="button-small" type="button">Copy</button></div>`;
+        card.querySelector('button').addEventListener('click', () => copyText(feed.url, 'Feed URL copied'));
+        grid.append(card);
+      });
+    }
+
+    function renderChecklist() {
+      const root = document.getElementById('checklist');
+      root.textContent = '';
+      sections.forEach((section, sectionIndex) => {
+        const wrapper = document.createElement('section');
+        wrapper.className = 'section';
+        wrapper.innerHTML = `<div class="section-title"><span class="section-number">${sectionIndex + 1}</span><h2>${section.title}</h2></div><div class="test-list"></div>`;
+        const list = wrapper.querySelector('.test-list');
+        section.tests.forEach(test => list.append(renderTest(test)));
+        root.append(wrapper);
+      });
+      applyFilter();
+    }
+
+    function renderTest(test) {
+      const result = state.results[test.id] || { status: '', notes: '' };
+      const card = document.createElement('article');
+      card.className = 'test';
+      card.dataset.id = test.id;
+      card.dataset.status = result.status;
+      const steps = test.steps.map(step => `<li>${step}</li>`).join('');
+      card.innerHTML = `
+        <div class="test-main">
+          <div><div class="test-title"><h3>${test.title}</h3>${test.optional ? '<span class="optional">Optional</span>' : ''}</div><p class="test-summary">${test.summary}</p></div>
+          <select class="test-status" aria-label="Status for ${test.title}">
+            <option value="">Not tested</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="blocked">Blocked</option><option value="skipped">Skipped</option>
+          </select>
+        </div>
+        <details><summary>Steps, expected result, and notes</summary><div class="details-grid">
+          <div><div class="instructions"><strong>Steps</strong><ol>${steps}</ol></div><div class="instructions" style="margin-top:10px"><strong>Expected</strong>${test.expected}</div></div>
+          <div class="notes"><label for="notes-${test.id}">What actually happened?</label><textarea id="notes-${test.id}" placeholder="For a failure: exact error, screen/action, expected vs actual, and relevant Content Briefings → Logs entry. Never include credentials."></textarea></div>
+        </div></details>`;
+      const select = card.querySelector('select');
+      const textarea = card.querySelector('textarea');
+      select.value = result.status;
+      textarea.value = result.notes || '';
+      setStatusClass(select, result.status);
+      select.addEventListener('change', () => {
+        state.results[test.id].status = select.value;
+        card.dataset.status = select.value;
+        setStatusClass(select, select.value);
+        if (select.value === 'fail' || select.value === 'blocked') {
+          card.querySelector('details').open = true;
+          textarea.focus();
+        }
+        saveState();
+        applyFilter();
+      });
+      textarea.addEventListener('input', () => { state.results[test.id].notes = textarea.value; saveState(); });
+      return card;
+    }
+
+    function setStatusClass(select, status) {
+      select.className = `test-status${status ? ` status-${status}` : ''}`;
+    }
+
+    function bindEnvironment() {
+      document.querySelectorAll('[data-env]').forEach(field => {
+        const key = field.dataset.env;
+        field.value = state.environment[key] || '';
+        const event = field.tagName === 'SELECT' ? 'change' : 'input';
+        field.addEventListener(event, () => { state.environment[key] = field.value; saveState(); });
+      });
+    }
+
+    function updateProgress() {
+      const values = allTests.map(test => state.results[test.id]?.status || '');
+      const done = values.filter(Boolean).length;
+      const counts = countStatuses();
+      const percent = Math.round((done / values.length) * 100);
+      document.getElementById('progress-percent').textContent = `${percent}%`;
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+      document.getElementById('summary-mini').textContent = `${done} of ${values.length} recorded · ${counts.pass} passed · ${counts.fail} failed · ${counts.blocked} blocked`;
+    }
+
+    function countStatuses() {
+      const counts = { pass: 0, fail: 0, blocked: 0, skipped: 0, untested: 0 };
+      allTests.forEach(test => { const status = state.results[test.id]?.status; status ? counts[status]++ : counts.untested++; });
+      return counts;
+    }
+
+    function applyFilter() {
+      document.querySelectorAll('.test').forEach(card => {
+        const status = card.dataset.status || '';
+        const show = activeFilter === 'all' || (activeFilter === 'untested' && !status) || status === activeFilter;
+        card.classList.toggle('hidden', !show);
+      });
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.toggle('hidden', !section.querySelector('.test:not(.hidden)'));
+      });
+    }
+
+    function markdownReport() {
+      const counts = countStatuses();
+      const env = state.environment;
+      const lines = [
+        '# The Runbook Briefings QA Report', '',
+        `- **Overall:** ${env.overall || 'Testing in progress'}`,
+        `- **Tester:** ${env.tester || 'Not provided'}`,
+        `- **Test date:** ${env.date || 'Not provided'}`,
+        `- **Site:** ${env.site || 'Not provided'}`,
+        `- **WordPress:** ${env.wordpress || 'Not provided'}`,
+        `- **PHP:** ${env.php || 'Not provided'}`,
+        `- **Plugin:** ${env.plugin || 'Not provided'}`,
+        `- **Browser/device:** ${env.browser || 'Not provided'}`,
+        `- **Theme:** ${env.theme || 'Not provided'}`,
+        `- **Stack notes:** ${env.stack || 'None'}`, '',
+        '## Summary', '',
+        `- Pass: ${counts.pass}`,
+        `- Fail: ${counts.fail}`,
+        `- Blocked: ${counts.blocked}`,
+        `- Skipped: ${counts.skipped}`,
+        `- Not tested: ${counts.untested}`, ''
+      ];
+      const problems = allTests.filter(test => ['fail', 'blocked'].includes(state.results[test.id]?.status));
+      lines.push('## Failures and blockers', '');
+      if (!problems.length) lines.push('None recorded.', '');
+      problems.forEach(test => {
+        const result = state.results[test.id];
+        lines.push(`### ${result.status === 'fail' ? 'FAIL' : 'BLOCKED'} — ${test.title}`, '', `- **Section:** ${test.section}`, `- **Expected:** ${test.expected}`, `- **Actual / notes:** ${result.notes?.trim() || 'No details entered'}`, '');
+      });
+      lines.push('## Complete results', '', '| Status | Section | Check | Notes |', '|---|---|---|---|');
+      allTests.forEach(test => {
+        const result = state.results[test.id] || {};
+        const status = result.status ? result.status.toUpperCase() : 'NOT TESTED';
+        const notes = (result.notes || '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+        lines.push(`| ${status} | ${test.section} | ${test.title} | ${notes || '—'} |`);
+      });
+      lines.push('', '## Overall notes', '', env.overallNotes?.trim() || 'None.', '', `_Generated ${new Date().toISOString()}_`);
+      return lines.join('\n');
+    }
+
+    function updateReport() { document.getElementById('report-preview').textContent = markdownReport(); }
+
+    async function copyText(value, message = 'Copied') {
+      try { await navigator.clipboard.writeText(value); }
+      catch (_) {
+        const area = document.createElement('textarea'); area.value = value; document.body.append(area); area.select(); document.execCommand('copy'); area.remove();
+      }
+      toast(message);
+    }
+
+    function download(name, content, type) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([content], { type }));
+      link.download = name; document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    }
+
+    function toast(message) {
+      const element = document.getElementById('toast'); element.textContent = message; element.classList.add('show');
+      clearTimeout(toast.timer); toast.timer = setTimeout(() => element.classList.remove('show'), 2200);
+    }
+
+    document.querySelectorAll('.filter-button').forEach(button => button.addEventListener('click', () => {
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll('.filter-button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      applyFilter();
+    }));
+    document.getElementById('expand-problems').addEventListener('click', () => {
+      document.querySelectorAll('.test[data-status="fail"] details, .test[data-status="blocked"] details').forEach(details => details.open = true);
+      activeFilter = 'all'; document.querySelector('[data-filter="all"]').click();
+    });
+    document.getElementById('jump-report').addEventListener('click', () => { updateReport(); document.getElementById('report-panel').scrollIntoView({ behavior: 'smooth' }); });
+    document.getElementById('copy-report').addEventListener('click', () => copyText(markdownReport(), 'Report copied—paste it into Arena'));
+    document.getElementById('download-report').addEventListener('click', () => download('runbook-briefings-qa-report.md', markdownReport(), 'text/markdown'));
+    document.getElementById('export-json').addEventListener('click', () => download('runbook-briefings-qa-progress.json', JSON.stringify(state, null, 2), 'application/json'));
+    document.getElementById('import-json').addEventListener('click', () => document.getElementById('json-file').click());
+    document.getElementById('json-file').addEventListener('change', event => {
+      const file = event.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try { const imported = JSON.parse(reader.result); localStorage.setItem(STORAGE_KEY, JSON.stringify(imported)); location.reload(); }
+        catch (_) { toast('That progress file is not valid JSON'); }
+      };
+      reader.readAsText(file);
+    });
+    document.getElementById('print-report').addEventListener('click', () => window.print());
+    document.getElementById('reset-all').addEventListener('click', () => {
+      if (!confirm('Reset every status, note, and environment field? This cannot be undone unless you exported JSON.')) return;
+      localStorage.removeItem(STORAGE_KEY); location.reload();
+    });
+
+    renderFeeds();
+    renderChecklist();
+    bindEnvironment();
+    updateProgress();
+    updateReport();
+  </script>
+</body>
+</html>
