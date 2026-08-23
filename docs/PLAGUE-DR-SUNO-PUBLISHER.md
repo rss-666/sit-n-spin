@@ -13,13 +13,15 @@ The plugin is an adapter. It does not modify theme files.
 
 ## Recommended Theme Workflow
 
-1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.3.0+.
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.3.1+.
 2. Open **Plague Dr Music → Add from Suno**.
 3. Choose **Theme Soundtrack**, **Theme Music Video**, **Theme Soundtrack + Music Video**, or page placement.
 4. Provide a Suno URL and/or local Media Library audio for Soundtrack playback.
 5. Provide a YouTube, Vimeo, or direct `.mp4`/`.webm`/`.mov` URL for Music Video publishing.
 6. Enter the shared title, description/credits, dedicated lyrics, duration, and artwork plus applicable track/video metadata.
-7. Save as Draft, review each linked native entry, and publish when ready.
+7. Submit once. The confirmation panel shows exactly what was created, its status, and direct View/Edit buttons for the managed release, Soundtrack, Video Release, or selected destination.
+
+Theme publishing is automatic after that submission. A shortcode or second URL entry is not required. Shortcodes remain available only for optional manual placement inside another layout.
 
 The linked `pdu_track` then participates naturally in:
 

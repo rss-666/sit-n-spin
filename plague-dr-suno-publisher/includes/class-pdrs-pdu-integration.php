@@ -183,7 +183,12 @@ final class PDRS_PDU_Integration {
         }
         $native_id = get_queried_object_id();
         $song_id   = absint( get_post_meta( $native_id, '_pdrs_managed_song_id', true ) );
-        if ( ! $song_id || 'publish' !== get_post_status( $song_id ) ) {
+        if ( ! $song_id ) {
+            return $content;
+        }
+        $managed_is_public = 'publish' === get_post_status( $song_id );
+        $native_is_public  = 'publish' === get_post_status( $native_id );
+        if ( ! $managed_is_public && ! $native_is_public && ! current_user_can( 'edit_post', $song_id ) ) {
             return $content;
         }
         $lyrics = PDRS_Renderer::lyrics_html( $song_id, true );

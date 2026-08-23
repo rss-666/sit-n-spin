@@ -216,5 +216,17 @@ pdrs_test( 'Video-only mode works without a Suno URL and does not create a Sound
     pdrs_same( 'draft', get_post_status( $result ) );
 } );
 
+pdrs_test( 'Published native page still renders player and lyrics if managed status is mismatched', static function (): void {
+    $track_id = PDRS_PDU_Integration::linked_track_id( 300 );
+    $GLOBALS['pdrs_posts'][300]->post_status = 'draft';
+    $GLOBALS['pdrs_posts'][ $track_id ]->post_status = 'publish';
+    delete_post_meta( $track_id, 'pdu_audio_url' );
+    $GLOBALS['pdrs_queried_id'] = $track_id;
+    $GLOBALS['pdrs_can_edit'] = false;
+    $html = ( new PDRS_PDU_Integration() )->single_track_player( '<p>Public native body</p>' );
+    pdrs_assert( str_contains( $html, 'https://suno.com/embed/' ) );
+    pdrs_assert( str_contains( $html, 'The street remembers' ) );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed ? 1 : 0 );

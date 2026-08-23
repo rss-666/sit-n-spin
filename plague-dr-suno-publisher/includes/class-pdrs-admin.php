@@ -56,7 +56,8 @@ final class PDRS_Admin {
         ?>
         <div class="wrap pdrs-admin">
             <h1><?php esc_html_e( 'Plague Dr Suno Publisher', 'plague-dr-suno-publisher' ); ?></h1>
-            <p class="pdrs-lede"><?php esc_html_e( 'Paste a public Suno song link and publish it as a native Plague Dr Universe Soundtrack or place the hosted player on another WordPress destination.', 'plague-dr-suno-publisher' ); ?></p>
+            <p class="pdrs-lede"><?php esc_html_e( 'Create a native Soundtrack, Music Video, both, or a reversible page placement from one managed music release.', 'plague-dr-suno-publisher' ); ?></p>
+            <?php $this->created_summary(); ?>
             <div class="pdrs-layout">
                 <form class="pdrs-card" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                     <input type="hidden" name="action" value="pdrs_add_song">
@@ -237,7 +238,7 @@ final class PDRS_Admin {
                 ? __( 'Song added and activated on its selected destination.', 'plague-dr-suno-publisher' )
                 : __( 'Song saved as a draft. Review it and publish when ready.', 'plague-dr-suno-publisher' ) );
         $this->set_notice( 'success', $message );
-        $this->redirect_edit( (int) $post_id );
+        $this->redirect_created( (int) $post_id );
     }
 
     public function meta_box( WP_Post $post ): void {
@@ -435,6 +436,53 @@ final class PDRS_Admin {
         return $links;
     }
 
+    private function created_summary(): void {
+        $created_id = absint( $_GET['pdrs_created'] ?? 0 );
+        $release    = $created_id ? get_post( $created_id ) : null;
+        if ( ! $release || PDRS_Plugin::POST_TYPE !== $release->post_type || ! current_user_can( 'edit_post', $created_id ) ) {
+            return;
+        }
+
+        $mode           = PDRS_PDU_Integration::mode_for( $created_id );
+        $track_id       = PDRS_PDU_Integration::linked_track_id( $created_id );
+        $video_id       = PDRS_PDU_Integration::linked_video_id( $created_id );
+        $destination_id = absint( get_post_meta( $created_id, '_pdrs_destination_id', true ) );
+        ?>
+        <section class="pdrs-result" aria-labelledby="pdrs-result-title">
+            <div><span class="pdrs-result__check" aria-hidden="true">✓</span></div>
+            <div>
+                <h2 id="pdrs-result-title"><?php esc_html_e( 'Release created and synchronized', 'plague-dr-suno-publisher' ); ?></h2>
+                <p><?php echo esc_html( get_the_title( $created_id ) ); ?> · <strong><?php echo esc_html( ucfirst( get_post_status( $created_id ) ) ); ?></strong></p>
+                <?php if ( 'destination' !== $mode ) : ?>
+                    <p><?php esc_html_e( 'The theme entries and public placement are already connected. No shortcode or second URL entry is required.', 'plague-dr-suno-publisher' ); ?></p>
+                <?php elseif ( $destination_id ) : ?>
+                    <p><?php esc_html_e( 'The selected page/post placement is automatic. No shortcode is required.', 'plague-dr-suno-publisher' ); ?></p>
+                <?php else : ?>
+                    <p><?php esc_html_e( 'No automatic destination was selected. Use the shortcode only when you want manual block-level placement.', 'plague-dr-suno-publisher' ); ?></p>
+                <?php endif; ?>
+                <div class="pdrs-result__actions">
+                    <a class="button" href="<?php echo esc_url( get_edit_post_link( $created_id ) ); ?>"><?php esc_html_e( 'Edit managed release', 'plague-dr-suno-publisher' ); ?></a>
+                    <?php $this->native_result_link( $track_id, __( 'Soundtrack', 'plague-dr-suno-publisher' ) ); ?>
+                    <?php $this->native_result_link( $video_id, __( 'Music Video', 'plague-dr-suno-publisher' ) ); ?>
+                    <?php if ( $destination_id ) : ?><a class="button" href="<?php echo esc_url( get_permalink( $destination_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View destination', 'plague-dr-suno-publisher' ); ?></a><?php endif; ?>
+                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=plague-dr-music' ) ); ?>"><?php esc_html_e( 'Add another release', 'plague-dr-suno-publisher' ); ?></a>
+                </div>
+            </div>
+        </section>
+        <?php
+    }
+
+    private function native_result_link( int $post_id, string $label ): void {
+        if ( ! $post_id ) {
+            return;
+        }
+        $status   = get_post_status( $post_id );
+        $view_url = 'publish' === $status ? get_permalink( $post_id ) : get_preview_post_link( $post_id );
+        ?>
+        <span class="pdrs-result__native"><a class="button" href="<?php echo esc_url( get_edit_post_link( $post_id ) ); ?>"><?php echo esc_html( sprintf( /* translators: 1: content label, 2: post ID. */ __( 'Edit %1$s #%2$d', 'plague-dr-suno-publisher' ), $label, $post_id ) ); ?></a><?php if ( $view_url ) : ?><a class="button" href="<?php echo esc_url( $view_url ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( sprintf( /* translators: %s: content label. */ __( 'View %s', 'plague-dr-suno-publisher' ), $label ) ); ?></a><?php endif; ?></span>
+        <?php
+    }
+
     private function destination_select( string $name, int $selected_id, string $id ): void {
         echo '<select class="widefat" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '">';
         echo '<option value="0">' . esc_html__( 'No automatic destination', 'plague-dr-suno-publisher' ) . '</option>';
@@ -518,6 +566,11 @@ final class PDRS_Admin {
 
     private function redirect_add(): void {
         wp_safe_redirect( admin_url( 'admin.php?page=plague-dr-music' ) );
+        exit;
+    }
+
+    private function redirect_created( int $post_id ): void {
+        wp_safe_redirect( admin_url( 'admin.php?page=plague-dr-music&pdrs_created=' . $post_id ) );
         exit;
     }
 

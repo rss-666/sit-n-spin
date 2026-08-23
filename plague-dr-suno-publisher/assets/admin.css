@@ -14,6 +14,24 @@
     grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr);
 }
 
+.pdrs-result {
+    align-items: flex-start;
+    background: #edf9f0;
+    border: 1px solid #8bc59a;
+    border-left: 5px solid #1e8c45;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: auto 1fr;
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.pdrs-result h2 { margin: 0 0 5px; }
+.pdrs-result p { margin: 4px 0 12px; }
+.pdrs-result__check { align-items: center; background: #1e8c45; border-radius: 50%; color: #fff; display: inline-flex; font-size: 20px; font-weight: 800; height: 36px; justify-content: center; width: 36px; }
+.pdrs-result__actions { align-items: center; display: flex; flex-wrap: wrap; gap: 7px; }
+.pdrs-result__native { display: inline-flex; gap: 4px; }
+
 .pdrs-card {
     background: #fff;
     border: 1px solid #dcdcde;
