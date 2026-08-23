@@ -108,5 +108,56 @@ pdrs_test( 'Draft shortcode stays hidden from visitors but remains previewable t
     pdrs_assert( str_contains( $renderer->shortcode( array( 'id' => 101 ) ), 'data-suno-song-id' ) );
 } );
 
+pdrs_test( 'Theme adapter accepts direct audio files but rejects Suno webpages as audio', static function () use ( $uuid ): void {
+    pdrs_same( 'https://plaguedr.test/uploads/track.mp3', PDRS_PDU_Integration::audio_url( 'https://plaguedr.test/uploads/track.mp3' ) );
+    pdrs_same( '', PDRS_PDU_Integration::audio_url( 'https://suno.com/song/' . $uuid ) );
+    pdrs_same( '4:12', PDRS_PDU_Integration::duration( '4:12' ) );
+    pdrs_same( '', PDRS_PDU_Integration::duration( 'four minutes' ) );
+} );
+
+pdrs_test( 'Theme Soundtrack sync creates one native entry and updates it without duplicates', static function () use ( $uuid ): void {
+    $GLOBALS['pdrs_posts'][300] = (object) array(
+        'ID' => 300,
+        'post_type' => PDRS_Plugin::POST_TYPE,
+        'post_status' => 'publish',
+        'post_title' => 'Rain Over First Avenue',
+        'post_content' => 'A soundtrack written for the rain sequence.',
+        'post_author' => 1,
+    );
+    $GLOBALS['pdrs_meta'][300] = array(
+        '_pdrs_song_id' => $uuid,
+        '_pdrs_placement_mode' => PDRS_PDU_Integration::MODE,
+        '_pdrs_album' => 'Emerald Rot',
+        '_pdrs_duration' => '4:12',
+        '_pdrs_audio_url' => 'https://plaguedr.test/uploads/rain.mp3',
+        '_pdrs_import_artwork' => 0,
+    );
+    $first = PDRS_PDU_Integration::sync_song( 300 );
+    pdrs_assert( is_int( $first ) && $first > 0 );
+    pdrs_same( 'pdu_track', get_post_type( $first ) );
+    pdrs_same( 'Emerald Rot', get_post_meta( $first, 'pdu_album', true ) );
+    pdrs_same( 'https://plaguedr.test/uploads/rain.mp3', get_post_meta( $first, 'pdu_audio_url', true ) );
+
+    $GLOBALS['pdrs_posts'][300]->post_title = 'Rain Over First Avenue — Remastered';
+    $second = PDRS_PDU_Integration::sync_song( 300 );
+    pdrs_same( $first, $second );
+    pdrs_same( 'Rain Over First Avenue — Remastered', get_the_title( $second ) );
+    $native = array_filter( $GLOBALS['pdrs_posts'], static fn( $post ): bool => 'pdu_track' === $post->post_type );
+    pdrs_same( 1, count( $native ) );
+} );
+
+pdrs_test( 'Theme track uses native audio when present and Suno fallback when absent', static function (): void {
+    $track_id = PDRS_PDU_Integration::linked_track_id( 300 );
+    $GLOBALS['pdrs_queried_id'] = $track_id;
+    $integration = new PDRS_PDU_Integration();
+    pdrs_same( '<p>Track body</p>', $integration->single_track_player( '<p>Track body</p>' ) );
+
+    delete_post_meta( 300, '_pdrs_audio_url' );
+    PDRS_PDU_Integration::sync_song( 300 );
+    $fallback = $integration->single_track_player( '<p>Track body</p>' );
+    pdrs_assert( str_contains( $fallback, 'https://suno.com/embed/' ) );
+    pdrs_assert( str_contains( $fallback, '<p>Track body</p>' ) );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed ? 1 : 0 );

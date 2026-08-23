@@ -2,69 +2,122 @@
 
 ## Purpose
 
-Plague Dr Suno Publisher accepts a public Suno song URL and displays Suno's hosted player on a selected WordPress page or post. The destination is stored on the managed song record rather than inserted into the destination's `post_content`, making placement reversible.
+Plague Dr Suno Publisher accepts a public Suno song URL and either:
 
-## Workflow
+- creates a native Soundtrack entry for **The Plague Dr Universe** theme; or
+- dynamically places Suno's hosted player on a selected WordPress page/post.
 
-1. Install and activate the plugin.
+The plugin is an adapter. It does not modify theme files.
+
+## Recommended Theme Workflow
+
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.1.0+.
 2. Open **Plague Dr Music → Add from Suno**.
-3. Paste a full public `https://suno.com/song/{uuid}` link. `/embed/` links are also accepted; `/s/` links are resolved when Suno permits it.
-4. Optionally enter a title, description/credits/lyrics, and HTTPS artwork URL. Missing public metadata is requested from the Suno embed page.
-5. Select any WordPress page or post the current user can edit.
-6. Select before/after placement and Draft/Active visibility.
-7. Edit the managed song later to move it to a different destination.
+3. Paste a full public `https://suno.com/song/{uuid}` URL.
+4. Keep **Publishing mode** set to **Plague Dr Universe Soundtrack**.
+5. Review or enter the title, description/credits/lyrics, artwork, album, duration, genre, and buy/stream URL.
+6. Optionally choose a direct audio file from Media Library.
+7. Save as Draft, review the linked Soundtrack, and publish when ready.
 
-## Automatic vs manual placement
+The linked `pdu_track` then participates naturally in:
 
-An **Active** song with a destination is dynamically added when WordPress renders that destination. Its database content is not rewritten. Setting the song to Draft hides the automatic placement.
+- the homepage **Now Streaming** query;
+- the `/soundtracks/` archive cards;
+- the media template's album grouping;
+- individual themed Soundtrack pages;
+- the theme's MusicRecording structured data.
 
-For exact placement inside a block layout, use:
+## Hybrid Playback
+
+### Native local audio
+
+When a direct `.mp3`, `.ogg`, `.oga`, `.wav`, `.m4a`, or `.aac` URL is selected, the plugin writes it to `pdu_audio_url`. The theme's shared accessible HTML audio player handles playback on all theme surfaces.
+
+### Hosted Suno fallback
+
+A normal Suno song page is HTML—not an audio file—and must not be stored in `pdu_audio_url`.
+
+When Local audio is empty, the plugin:
+
+- stores the validated Suno ID separately;
+- displays Suno's `/embed/{song-id}` player on the individual Soundtrack page;
+- intercepts empty-source theme play buttons for managed songs and opens an accessible hosted-player dialog;
+- sends older browsers to the individual track page if `<dialog>` is unavailable.
+
+The iframe is generated only from a UUID-shaped Suno ID. Homepage modal iframes are not loaded until a visitor presses play.
+
+## Synchronized Theme Data
+
+Each managed song owns one linked `pdu_track`. The plugin synchronizes:
+
+| Managed song | Theme Soundtrack |
+|---|---|
+| Title | `post_title` |
+| Description/credits/lyrics | `post_content` and bounded `post_excerpt` |
+| Draft/Active status | Native track status |
+| Album/release | `pdu_album` |
+| Duration | `pdu_duration` |
+| Genre | `pdu_genre` taxonomy |
+| Buy/stream URL | `pdu_buy_url` |
+| Direct local audio | `pdu_audio_url` |
+| Imported artwork | Featured image |
+
+Bidirectional protected metadata prevents duplicate Soundtrack records. Updating the managed song updates its existing track. Switching back to page placement moves the linked Soundtrack to Draft rather than deleting editorial work.
+
+## Generic Page Placement
+
+Choose **Page/post destination** to keep the original reversible behavior. An Active song can appear before or after any editable public page/post without rewriting that destination's `post_content`.
+
+For exact block-level placement, use:
 
 ```text
 [plague_dr_song id="123"]
 ```
 
-Choose **No automatic destination** to use only the shortcode. A published song can be used on multiple pages by placing the shortcode more than once.
+## Artwork
+
+When **Import this artwork into the Media Library as the theme cover image** is checked, the plugin safely sideloads the validated HTTPS artwork and sets it as the linked Soundtrack's featured image. Failed artwork imports do not block track synchronization; set a cover manually if needed.
+
+Only import artwork you have the right to publish.
 
 ## Security
 
 - Adding songs requires `edit_pages`; immediate activation requires `publish_pages`.
-- Editing placement requires permission to edit both the song and destination.
+- Editing placement requires permission to edit both the managed song and selected destination.
 - Add and edit actions use WordPress nonces.
-- Only exact Suno hosts, HTTPS artwork, and UUID-shaped song identifiers are accepted.
+- Only exact Suno hosts and UUID-shaped song IDs are accepted.
 - Short-link redirects remain restricted to Suno hosts and safe WordPress HTTP requests.
-- External requests have strict timeouts, response-size limits, and no credentials.
-- The embed URL is generated from a validated song ID rather than rendered from arbitrary HTML.
-- Song text is sanitized with WordPress content APIs and output is escaped.
-
-## Media and privacy
-
-The plugin does not download, copy, or rehost audio. Suno hosts the iframe player and public artwork. Loading a player causes the visitor's browser to connect to Suno. Site owners should disclose this third-party media behavior in their privacy policy when appropriate.
-
-Only use songs and artwork you have the right to publish. Suno availability and embed behavior remain controlled by Suno.
+- External requests have strict timeouts and response-size limits.
+- Direct audio accepts only safe public HTTP(S) URLs with an approved audio extension.
+- Suno embed URLs are generated from validated IDs rather than arbitrary iframe HTML.
+- Song text is sanitized and output is escaped.
+- The theme is never edited by the plugin.
 
 ## Troubleshooting
 
-### A short link will not resolve
+### Track appears but the theme play button says preview unavailable
 
-Open it in a browser and copy the resulting full `/song/{uuid}` URL. Suno may challenge automated requests even when a browser can follow the link.
+Edit the managed Plague Dr Song and verify it is using **Theme Soundtrack** mode. If Local audio is empty, confirm the plugin's `pdu-integration.js` is not blocked by optimization or security software and clear page/CDN caches. The play button should open the hosted-player dialog.
 
-### The player does not appear
+### Native playback fails
 
-- Confirm the managed song status is **Active**, not Draft.
-- Confirm the destination is selected and the destination itself is viewable.
-- Check whether a security plugin or Content Security Policy blocks frames from `https://suno.com`.
-- Open the original Suno URL and confirm the song is still public.
-- Clear page/CDN caches after changing placement.
+Confirm Local audio points directly to a supported audio file—not a Suno page, attachment page, or HTML download page. Open the URL in a private browser window; it should return playable audio.
 
-### Metadata is blank
+### Soundtrack does not appear
 
-Metadata is optional. Enter the title, text, and HTTPS artwork manually. Anti-bot responses can prevent server-side metadata lookup without affecting the public hosted player.
+- Confirm both the managed song and linked Soundtrack are Published.
+- Open the linked Soundtrack from the Suno Placement meta box.
+- Clear page/CDN caches.
+- Confirm The Plague Dr Universe theme still registers `pdu_track`.
 
-### A page builder does not show automatic placement in its preview
+### Metadata or artwork is blank
 
-View the actual page. Some builders bypass WordPress's normal main `the_content` render in editor previews. Use the shortcode block for exact placement in custom builder layouts.
+Metadata lookup is optional and may be challenged by Suno. Enter fields manually. Cover-image import can fail when a remote host blocks server requests; use WordPress's normal Featured Image control on the linked Soundtrack.
 
-## Uninstall behavior
+### Short link will not resolve
 
-Uninstall removes the plugin version option but deliberately retains managed song posts and metadata to prevent accidental loss of titles, lyrics, and placement choices. Delete song records before uninstalling when permanent removal is desired.
+Open it in a browser and copy the resulting full `/song/{uuid}` URL.
+
+## Uninstall Behavior
+
+Managed song and linked Soundtrack records are retained to prevent accidental loss. Native tracks with local audio continue working after plugin removal. Hosted-only tracks need the plugin for the Suno fallback player.

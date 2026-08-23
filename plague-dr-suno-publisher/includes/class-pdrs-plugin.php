@@ -28,6 +28,7 @@ final class PDRS_Plugin {
         add_action( 'init', array( self::class, 'register_post_type' ) );
         add_filter( 'post_updated_messages', array( $this, 'updated_messages' ) );
         ( new PDRS_Renderer() )->hooks();
+        ( new PDRS_PDU_Integration() )->hooks();
 
         if ( is_admin() ) {
             ( new PDRS_Admin() )->hooks();
@@ -73,6 +74,14 @@ final class PDRS_Plugin {
         register_post_meta( self::POST_TYPE, '_pdrs_destination_id', array( 'type' => 'integer', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => 'absint', 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
         register_post_meta( self::POST_TYPE, '_pdrs_position', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => 'sanitize_key', 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
         register_post_meta( self::POST_TYPE, '_pdrs_artwork_url', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => static fn( $value ): string => PDRS_Metadata::image_url( (string) $value ), 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_placement_mode', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => static fn( $value ): string => PDRS_PDU_Integration::MODE === $value ? PDRS_PDU_Integration::MODE : 'destination', 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_album', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => 'sanitize_text_field', 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_duration', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => static fn( $value ): string => PDRS_PDU_Integration::duration( (string) $value ), 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_genre', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => 'sanitize_text_field', 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_buy_url', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => static fn( $value ): string => esc_url_raw( (string) $value ), 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_audio_url', array( 'type' => 'string', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => static fn( $value ): string => PDRS_PDU_Integration::audio_url( (string) $value ), 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_import_artwork', array( 'type' => 'boolean', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => static fn( $value ): bool => (bool) $value, 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
+        register_post_meta( self::POST_TYPE, '_pdrs_pdu_track_id', array( 'type' => 'integer', 'single' => true, 'show_in_rest' => false, 'sanitize_callback' => 'absint', 'auth_callback' => static fn(): bool => current_user_can( 'edit_pages' ) ) );
     }
 
     /**

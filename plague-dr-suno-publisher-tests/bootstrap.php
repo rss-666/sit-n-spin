@@ -44,6 +44,30 @@ function set_transient( string $key, $value, int $expiration ): bool { return tr
 function home_url( string $path = '' ): string { return 'https://plaguedr.test' . $path; }
 function get_post( int $id ) { return $GLOBALS['pdrs_posts'][ $id ] ?? null; }
 function get_post_meta( int $id, string $key, bool $single = false ) { return $GLOBALS['pdrs_meta'][ $id ][ $key ] ?? ''; }
+function update_post_meta( int $id, string $key, $value ): bool { $GLOBALS['pdrs_meta'][ $id ][ $key ] = $value; return true; }
+function delete_post_meta( int $id, string $key ): bool { unset( $GLOBALS['pdrs_meta'][ $id ][ $key ] ); return true; }
+function get_post_type( $post = null ): string { $object = is_object( $post ) ? $post : get_post( (int) $post ); return $object ? (string) $object->post_type : ''; }
+function get_post_status( $post = null ): string { $object = is_object( $post ) ? $post : get_post( (int) $post ); return $object ? (string) $object->post_status : ''; }
+function wp_insert_post( array $post, bool $wp_error = false ) {
+    $id = empty( $GLOBALS['pdrs_posts'] ) ? 100 : max( array_keys( $GLOBALS['pdrs_posts'] ) ) + 1;
+    $post['ID'] = $id;
+    $post += array( 'post_content' => '', 'post_author' => 1, 'post_excerpt' => '' );
+    $GLOBALS['pdrs_posts'][ $id ] = (object) $post;
+    return $id;
+}
+function wp_update_post( array $post, bool $wp_error = false ) {
+    $id = (int) $post['ID'];
+    $current = (array) ( $GLOBALS['pdrs_posts'][ $id ] ?? (object) array( 'ID' => $id ) );
+    $GLOBALS['pdrs_posts'][ $id ] = (object) array_merge( $current, $post );
+    return $id;
+}
+function wp_slash( $value ) { return $value; }
+function wp_strip_all_tags( $value ): string { return strip_tags( (string) $value ); }
+function wp_trim_words( string $text, int $number = 55, string $more = null ): string { return implode( ' ', array_slice( preg_split( '/\s+/', trim( $text ) ) ?: array(), 0, $number ) ); }
+function taxonomy_exists( string $taxonomy ): bool { return false; }
+function wp_set_object_terms( int $object_id, $terms, string $taxonomy, bool $append = false ): array { return array(); }
+function wp_is_post_revision( int $id ): bool { return false; }
+function get_permalink( $post = 0 ): string { $id = is_object( $post ) ? $post->ID : (int) $post; return 'https://plaguedr.test/soundtracks/' . $id . '/'; }
 function get_the_title( $post ): string {
     $object = is_object( $post ) ? $post : get_post( (int) $post );
     return $object ? (string) $object->post_title : '';
@@ -63,6 +87,7 @@ function get_posts( array $args ): array {
 }
 function is_admin(): bool { return false; }
 function is_feed(): bool { return false; }
+function post_type_exists( string $post_type ): bool { return in_array( $post_type, array( PDRS_Plugin::POST_TYPE, 'pdu_track' ), true ); }
 function is_singular(): bool { return true; }
 function get_queried_object_id(): int { return (int) $GLOBALS['pdrs_queried_id']; }
 function get_the_ID(): int { return (int) $GLOBALS['pdrs_queried_id']; }
@@ -73,3 +98,4 @@ function absint( $value ): int { return abs( (int) $value ); }
 require_once dirname( __DIR__ ) . '/plague-dr-suno-publisher/includes/class-pdrs-suno-url.php';
 require_once dirname( __DIR__ ) . '/plague-dr-suno-publisher/includes/class-pdrs-metadata.php';
 require_once dirname( __DIR__ ) . '/plague-dr-suno-publisher/includes/class-pdrs-renderer.php';
+require_once dirname( __DIR__ ) . '/plague-dr-suno-publisher/includes/class-pdrs-pdu-integration.php';

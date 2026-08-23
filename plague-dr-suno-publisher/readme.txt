@@ -1,76 +1,85 @@
 === Plague Dr Suno Publisher ===
 Contributors: plaguedr
-Tags: suno, music, audio, embed, pages
+Tags: suno, music, audio, embed, soundtracks
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Place your public Suno songs on any WordPress page or post and change the destination whenever you want.
+Publish public Suno songs as native Plague Dr Universe Soundtracks or place them on any WordPress page.
 
 == Description ==
 
-Plague Dr Suno Publisher gives Plague Dr Music an easy, reversible workflow:
+Plague Dr Suno Publisher provides two publishing modes:
 
-1. Paste your public Suno song URL.
-2. Optionally edit the title, description or lyrics, and artwork.
-3. Choose any editable WordPress page or post.
-4. Place the player before or after that destination's content.
-5. Move it later by selecting another destination.
+1. **Plague Dr Universe Soundtrack** — creates and synchronizes the theme's native `pdu_track` entry so the song appears in the homepage Now Streaming list, `/soundtracks/` archive, and themed individual track layout.
+2. **Page/post destination** — dynamically places the hosted Suno player before or after another WordPress page or post without rewriting its stored content.
 
-The plugin does not permanently inject markup into the destination's saved content. Active song placements are added when WordPress renders the selected destination, so moving a song does not leave stale players behind.
-
-Every song also receives a shortcode:
+Every managed song also receives a shortcode:
 
 `[plague_dr_song id="123"]`
 
-Audio stays hosted by Suno. The plugin does not download or rehost music.
+=== Hybrid playback ===
+
+- Choose a direct MP3/OGG/WAV/M4A/AAC file from the WordPress Media Library to use the theme's native shared audio player everywhere.
+- Leave Local audio empty to use Suno's official hosted player. On the homepage and media track lists, the play button opens an accessible modal. The individual Soundtrack page displays the hosted player.
+- A Suno webpage is never incorrectly passed to the HTML audio element as an audio file.
+
+=== Theme metadata ===
+
+Soundtrack mode synchronizes title, description, excerpt, status, album, duration, genre, buy/stream URL, and optional cover artwork. Updating the managed song updates the same linked Soundtrack instead of creating duplicates. New songs default to Draft.
 
 == Installation ==
 
-1. Upload `plague-dr-suno-publisher.zip` through Plugins -> Add New Plugin -> Upload Plugin.
+1. Upload `plague-dr-suno-publisher-1.1.0.zip` through Plugins -> Add New Plugin -> Upload Plugin.
 2. Activate Plague Dr Suno Publisher.
 3. Open Plague Dr Music -> Add from Suno.
-4. Paste a public full Suno song URL, choose a destination, and save it as Draft or Active.
+4. Paste a public full Suno song URL.
+5. Leave Publishing mode on Plague Dr Universe Soundtrack when that theme is active.
+6. Add album, duration, genre, purchase URL, and optional local audio.
+7. Save as Draft or Active.
 
 == Frequently Asked Questions ==
 
-= Can I change the destination? =
+= Does this modify The Plague Dr Universe theme? =
 
-Yes. Open Plague Dr Music -> All Songs, edit the song, and select another page or post in Suno Placement. Update the song and its automatic player moves.
+No. The integration is an adapter inside the plugin. Theme files remain untouched and updateable.
 
-= Can I put one song in a precise location? =
+= Should I put the Suno URL in Audio File URL? =
 
-Yes. Choose No automatic destination and place its shortcode in any WordPress Shortcode block. You can also use the shortcode in addition to an automatic destination.
+No. The theme's Audio File URL expects direct audio bytes such as an MP3. The plugin stores the Suno ID separately and renders the hosted player when no direct file is selected.
 
-= Does activating a song publish or change the destination page? =
+= How do I use the native theme player? =
 
-It does not change the page's saved content or status. An Active song appears when its selected destination is rendered. A Draft song remains hidden from automatic destinations.
+Download a song you own through your Suno account, upload the audio file to WordPress Media Library, and choose it under Local audio. Only use media you have the right to publish.
 
-= Does the plugin download my song? =
+= Will syncing create duplicate Soundtrack posts? =
 
-No. It embeds Suno's hosted `/embed/` player and links back to the public Suno song.
+No. The plugin stores relationships in both directions and updates the same `pdu_track` entry. Trashing the managed song also trashes its linked Soundtrack.
+
+= Can I still place a player on another page? =
+
+Yes. Choose Page/post destination, or use the shortcode in a Shortcode block.
 
 = Why did a Suno short share link fail? =
 
-Suno or its anti-bot layer may prevent server-side short-link resolution. Open the short link in your browser and paste the resulting full `https://suno.com/song/…` URL.
-
-= Which URL formats are supported? =
-
-Full `suno.com/song/{song-id}` and `suno.com/embed/{song-id}` links are supported. Legacy `suno.ai` equivalents are accepted. The plugin attempts to resolve `suno.com/s/…` links.
+Suno or its anti-bot layer may prevent server-side short-link resolution. Open it in your browser and paste the resulting full `https://suno.com/song/…` URL.
 
 == Privacy ==
 
-A metadata request is sent to Suno only when a song is added and its public title, description, or artwork is needed. Visitors who view an embedded player connect to Suno under Suno's privacy terms. No Suno account credential or API key is collected.
+A metadata request is sent to Suno only when a song is added and public title, description, or artwork is needed. The hosted iframe is loaded on an individual track page or after a visitor presses a hosted track's play button. No Suno account credential or API key is collected.
 
 == Changelog ==
 
+= 1.1.0 =
+* Added native The Plague Dr Universe `pdu_track` synchronization.
+* Added album, duration, genre, buy/stream URL, local audio, and cover-art fields.
+* Added Media Library audio selection and native-player precedence.
+* Added hosted Suno fallback player for individual Soundtrack pages.
+* Added accessible hosted-player modal fallback for homepage and media track lists.
+* Added bidirectional relationships, status synchronization, and duplicate prevention.
+
 = 1.0.0 =
-* Initial release.
-* Added secure Suno URL validation and hosted player rendering.
-* Added changeable page/post destinations with before/after placement.
-* Added Draft and Active visibility.
-* Added public metadata lookup with manual fallback.
-* Added shortcodes and duplicate-song prevention.
+* Initial release with secure Suno URL validation, page destinations, hosted players, metadata lookup, shortcodes, and draft visibility.

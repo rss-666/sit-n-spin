@@ -32,58 +32,52 @@
     width: 100%;
 }
 
-.pdrs-song__body {
-    min-width: 0;
-}
+.pdrs-song__body { min-width: 0; }
+.pdrs-song__title { color: inherit; font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.15; margin: 0 0 .75rem; }
+.pdrs-song__description { color: rgba(255, 255, 255, .78); margin-bottom: 1rem; }
+.pdrs-song__description > :first-child { margin-top: 0; }
+.pdrs-song__player { background: #000; border-radius: 10px; min-height: 240px; overflow: hidden; position: relative; }
+.pdrs-song__player iframe { border: 0; display: block; height: 240px; width: 100%; }
+.pdrs-song__source { font-size: .875rem; margin: .75rem 0 0; text-align: right; }
+.pdrs-song__source a { color: #d5b7ff; }
 
-.pdrs-song__title {
-    color: inherit;
-    font-size: clamp(1.35rem, 3vw, 2rem);
-    line-height: 1.15;
+/* Native adapter for The Plague Dr Universe theme. */
+.pdrs-pdu-embed {
+    background: var(--pdu-surface, #101015);
+    border: 1px solid #343442;
+    color: var(--pdu-bone, #f1ede4);
+    margin: 0 0 2rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+}
+.pdrs-pdu-embed__eyebrow {
+    color: var(--pdu-amber, #c8912a);
+    font-family: Oswald, Impact, sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .18em;
     margin: 0 0 .75rem;
+    text-transform: uppercase;
 }
+.pdrs-pdu-embed iframe { border: 0; display: block; height: 240px; width: 100%; }
+.pdrs-pdu-embed > p:last-child { font-size: .8rem; margin: .75rem 0 0; text-align: right; }
+.pdrs-pdu-embed a { color: var(--pdu-amber, #c8912a); }
 
-.pdrs-song__description {
-    color: rgba(255, 255, 255, .78);
-    margin-bottom: 1rem;
-}
-
-.pdrs-song__description > :first-child {
-    margin-top: 0;
-}
-
-.pdrs-song__player {
-    background: #000;
-    border-radius: 10px;
-    min-height: 240px;
-    overflow: hidden;
-    position: relative;
-}
-
-.pdrs-song__player iframe {
-    border: 0;
-    display: block;
-    height: 240px;
+.pdrs-pdu-dialog {
+    background: #101015;
+    border: 1px solid #343442;
+    color: #f1ede4;
+    max-width: min(760px, calc(100vw - 2rem));
+    padding: 0;
     width: 100%;
 }
-
-.pdrs-song__source {
-    font-size: .875rem;
-    margin: .75rem 0 0;
-    text-align: right;
-}
-
-.pdrs-song__source a {
-    color: #d5b7ff;
-}
+.pdrs-pdu-dialog::backdrop { background: rgba(5, 5, 7, .88); backdrop-filter: blur(5px); }
+.pdrs-pdu-dialog__bar { align-items: center; border-bottom: 1px solid #343442; display: flex; gap: 1rem; justify-content: space-between; padding: 1rem 1.25rem; }
+.pdrs-pdu-dialog__bar h2 { color: #f1ede4; font-family: Oswald, Impact, sans-serif; font-size: 1.1rem; margin: 0; text-transform: uppercase; }
+.pdrs-pdu-dialog__bar button { background: transparent; border: 1px solid #c8912a; color: #f1ede4; cursor: pointer; padding: .45rem .8rem; }
+.pdrs-pdu-dialog iframe { border: 0; display: block; height: 280px; width: 100%; }
 
 @media (max-width: 680px) {
-    .pdrs-song {
-        grid-template-columns: 1fr;
-    }
-
-    .pdrs-song__artwork {
-        max-width: 260px;
-        width: 100%;
-    }
+    .pdrs-song { grid-template-columns: 1fr; }
+    .pdrs-song__artwork { max-width: 260px; width: 100%; }
+    .pdrs-pdu-dialog iframe { height: 240px; }
 }

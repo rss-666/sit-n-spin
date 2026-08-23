@@ -38,6 +38,20 @@
     border-left: 4px solid #7f54b3;
 }
 
+.pdrs-theme-fields {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-left: 4px solid #b3121b;
+    margin: 16px 0;
+    padding: 16px;
+}
+
+.pdrs-theme-fields h3 { margin-top: 0; }
+.pdrs-media-field { align-items: center; display: flex; gap: 8px; }
+.pdrs-media-field input { flex: 1; }
+
+[hidden] { display: none !important; }
+
 .pdrs-card code {
     display: inline-block;
     max-width: 100%;
