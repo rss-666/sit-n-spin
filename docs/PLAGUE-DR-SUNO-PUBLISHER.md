@@ -13,7 +13,7 @@ The plugin is an adapter. It does not modify theme files.
 
 ## Recommended Theme Workflow
 
-1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.4.0+.
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.4.1+.
 2. Open **Plague Dr Music → Add from Suno**.
 3. Choose **Theme Soundtrack**, **Theme Music Video**, **Theme Soundtrack + Music Video**, or page placement.
 4. Provide a Suno URL and/or local Media Library audio for Soundtrack playback.
@@ -54,6 +54,8 @@ When Local audio is empty, the plugin:
 - stores the validated Suno ID separately;
 - displays Suno's `/embed/{song-id}` player on the individual Soundtrack page;
 - intercepts empty-source theme play buttons for managed songs and opens an accessible hosted-player dialog;
+- keeps the player visible above an independently scrollable lyrics panel with preserved line breaks;
+- includes the highlighted artist credit and a direct full-Soundtrack link;
 - sends older browsers to the individual track page if `<dialog>` is unavailable.
 
 The iframe is generated only from a UUID-shaped Suno ID. Homepage modal iframes are not loaded until a visitor presses play.

@@ -22,6 +22,7 @@ $GLOBALS['pdrs_can_edit'] = false;
 
 function __( string $text, string $domain = '' ): string { return $text; }
 function esc_attr__( string $text, string $domain = '' ): string { return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' ); }
+function esc_attr_e( string $text, string $domain = '' ): void { echo esc_attr__( $text, $domain ); }
 function esc_html__( string $text, string $domain = '' ): string { return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' ); }
 function esc_html_e( string $text, string $domain = '' ): void { echo esc_html__( $text, $domain ); }
 function is_wp_error( $value ): bool { return $value instanceof WP_Error; }

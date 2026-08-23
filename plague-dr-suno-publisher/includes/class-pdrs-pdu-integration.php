@@ -257,7 +257,9 @@ final class PDRS_PDU_Integration {
             $details  = PDRS_Suno_URL::details( $suno_id );
             $tracks[] = array(
                 'title'    => get_the_title( $track_id ),
+                'artist'   => sanitize_text_field( (string) get_post_meta( $song->ID, '_pdrs_artist_name', true ) ),
                 'album'    => (string) get_post_meta( $track_id, 'pdu_album', true ),
+                'lyrics'   => self::plain_lyrics( (string) get_post_meta( $song->ID, '_pdrs_lyrics', true ) ),
                 'embedUrl' => $details['embed_url'],
                 'trackUrl' => get_permalink( $track_id ),
             );
@@ -271,8 +273,10 @@ final class PDRS_PDU_Integration {
             'pdrs-pdu',
             'pdrsPduTracks',
             array(
-                'tracks' => $tracks,
-                'close'  => __( 'Close player', 'plague-dr-suno-publisher' ),
+                'tracks'       => $tracks,
+                'close'        => __( 'Close player', 'plague-dr-suno-publisher' ),
+                'lyricsLabel'  => __( 'Lyrics', 'plague-dr-suno-publisher' ),
+                'openFullLabel'=> __( 'Open full Soundtrack page', 'plague-dr-suno-publisher' ),
             )
         );
     }
@@ -283,8 +287,13 @@ final class PDRS_PDU_Integration {
         }
         ?>
         <dialog class="pdrs-pdu-dialog" data-pdrs-dialog aria-labelledby="pdrs-dialog-title">
-            <div class="pdrs-pdu-dialog__bar"><h2 id="pdrs-dialog-title" data-pdrs-dialog-title><?php esc_html_e( 'Now streaming', 'plague-dr-suno-publisher' ); ?></h2><button type="button" data-pdrs-dialog-close><?php esc_html_e( 'Close', 'plague-dr-suno-publisher' ); ?></button></div>
+            <div class="pdrs-pdu-dialog__bar"><div><h2 id="pdrs-dialog-title" data-pdrs-dialog-title><?php esc_html_e( 'Now streaming', 'plague-dr-suno-publisher' ); ?></h2><p class="pdrs-pdu-dialog__artist" data-pdrs-dialog-artist hidden></p></div><button type="button" data-pdrs-dialog-close><?php esc_html_e( 'Close', 'plague-dr-suno-publisher' ); ?></button></div>
             <iframe data-pdrs-dialog-frame src="about:blank" title="<?php esc_attr_e( 'Suno music player', 'plague-dr-suno-publisher' ); ?>" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            <section class="pdrs-pdu-dialog__lyrics-wrap" data-pdrs-dialog-lyrics-wrap hidden aria-labelledby="pdrs-dialog-lyrics-title">
+                <h3 id="pdrs-dialog-lyrics-title"><?php esc_html_e( 'Lyrics', 'plague-dr-suno-publisher' ); ?></h3>
+                <div class="pdrs-pdu-dialog__lyrics" data-pdrs-dialog-lyrics tabindex="0" aria-label="<?php esc_attr_e( 'Scrollable song lyrics', 'plague-dr-suno-publisher' ); ?>"></div>
+            </section>
+            <footer class="pdrs-pdu-dialog__footer"><a data-pdrs-dialog-link href="#" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open full Soundtrack page', 'plague-dr-suno-publisher' ); ?></a></footer>
         </dialog>
         <?php
     }
@@ -417,6 +426,14 @@ final class PDRS_PDU_Integration {
         $details = PDRS_Suno_URL::details( $suno_id );
         $title   = get_the_title( $song_post_id );
         return '<section class="pdrs-pdu-embed" aria-label="' . esc_attr__( 'Hosted music player', 'plague-dr-suno-publisher' ) . '"><p class="pdrs-pdu-embed__eyebrow">' . esc_html__( 'Now streaming', 'plague-dr-suno-publisher' ) . '</p><iframe src="' . esc_url( $details['embed_url'] ) . '" title="' . esc_attr( sprintf( /* translators: %s: song title. */ __( 'Play %s on Suno', 'plague-dr-suno-publisher' ), $title ) ) . '" loading="lazy" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe><p><a href="' . esc_url( $details['source_url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Open this track on Suno', 'plague-dr-suno-publisher' ) . '</a></p></section>';
+    }
+
+    private static function plain_lyrics( string $lyrics ): string {
+        $lyrics = preg_replace( '#<br\s*/?>#i', "\n", $lyrics ) ?? $lyrics;
+        $lyrics = preg_replace( '#</p\s*>#i', "\n\n", $lyrics ) ?? $lyrics;
+        $lyrics = html_entity_decode( wp_strip_all_tags( $lyrics ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+        $lyrics = str_replace( array( "\r\n", "\r" ), "\n", $lyrics );
+        return trim( preg_replace( "/\n{3,}/", "\n\n", $lyrics ) ?? $lyrics );
     }
 
     private static function sync_text_meta( int $post_id, string $key, string $value ): void {

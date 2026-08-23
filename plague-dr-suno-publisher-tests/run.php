@@ -245,5 +245,24 @@ pdrs_test( 'Managed native pages receive scoped centered-header and lyrics cue c
     pdrs_assert( str_contains( $css, '.pdrs-pdu-artist { color: var(--pdu-amber, #c8912a);' ) );
 } );
 
+pdrs_test( 'Hosted popout includes keyboard-scrollable lyrics and safe text rendering', static function (): void {
+    $integration = new PDRS_PDU_Integration();
+    $reflection = new ReflectionClass( $integration );
+    $property = $reflection->getProperty( 'has_hosted_tracks' );
+    $property->setAccessible( true );
+    $property->setValue( $integration, true );
+    ob_start();
+    $integration->modal();
+    $html = (string) ob_get_clean();
+    pdrs_assert( str_contains( $html, 'data-pdrs-dialog-lyrics' ) );
+    pdrs_assert( str_contains( $html, 'tabindex="0"' ) );
+    pdrs_assert( str_contains( $html, 'data-pdrs-dialog-artist' ) );
+    pdrs_assert( str_contains( $html, 'data-pdrs-dialog-link' ) );
+
+    $script = (string) file_get_contents( dirname( __DIR__ ) . '/plague-dr-suno-publisher/assets/pdu-integration.js' );
+    pdrs_assert( str_contains( $script, "lyrics.textContent = track.lyrics || ''" ) );
+    pdrs_assert( ! str_contains( $script, 'lyrics.innerHTML' ) );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed ? 1 : 0 );

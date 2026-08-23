@@ -18,14 +18,26 @@
         }
         const frame = dialog.querySelector( '[data-pdrs-dialog-frame]' );
         const title = dialog.querySelector( '[data-pdrs-dialog-title]' );
+        const artist = dialog.querySelector( '[data-pdrs-dialog-artist]' );
+        const lyricsWrap = dialog.querySelector( '[data-pdrs-dialog-lyrics-wrap]' );
+        const lyrics = dialog.querySelector( '[data-pdrs-dialog-lyrics]' );
+        const fullLink = dialog.querySelector( '[data-pdrs-dialog-link]' );
         frame.src = track.embedUrl;
         title.textContent = track.title;
+        artist.textContent = track.artist || '';
+        artist.hidden = ! track.artist;
+        lyrics.textContent = track.lyrics || '';
+        lyricsWrap.hidden = ! track.lyrics;
+        lyrics.scrollTop = 0;
+        fullLink.href = track.trackUrl;
         dialog.showModal();
     }
 
     function closePlayer( dialog ) {
         const frame = dialog.querySelector( '[data-pdrs-dialog-frame]' );
+        const lyrics = dialog.querySelector( '[data-pdrs-dialog-lyrics]' );
         frame.src = 'about:blank';
+        lyrics.textContent = '';
         dialog.close();
     }
 
