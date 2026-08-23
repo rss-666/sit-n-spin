@@ -46,6 +46,48 @@
 .pdrs-song__lyrics-body p { margin: 0 0 1rem; }
 
 /* Native adapter for The Plague Dr Universe theme. */
+body.pdrs-managed-native .pdu-single > header .container {
+    padding-bottom: clamp(2.75rem, 6vw, 4.5rem);
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    text-align: center;
+}
+body.pdrs-managed-native .pdu-single > header .max-w-3xl {
+    margin-left: auto;
+    margin-right: auto;
+}
+body.pdrs-managed-native .pdu-single > header h1.text-display-lg {
+    font-size: clamp(2.35rem, 7vw, 5.5rem);
+    font-weight: 500;
+    letter-spacing: .015em;
+    line-height: .98;
+}
+body.pdrs-managed-native .pdu-single > header .lede {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 46rem;
+}
+body.pdrs-managed-native .pdu-single > header dl {
+    justify-content: center;
+}
+body.pdrs-managed-native .pdu-single > header::after {
+    bottom: 1rem;
+    color: var(--pdu-amber, #c8912a);
+    content: "CONTINUE ↓";
+    font-family: Oswald, Impact, sans-serif;
+    font-size: .72rem;
+    font-weight: 500;
+    left: 50%;
+    letter-spacing: .2em;
+    position: absolute;
+    text-transform: uppercase;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+body.pdrs-managed-track .pdu-single > header::after { content: "LISTEN ↓"; }
+body.pdrs-managed-track.pdrs-has-lyrics .pdu-single > header::after { content: "LISTEN · LYRICS ↓"; }
+body.pdrs-managed-video .pdu-single > header::after { content: "WATCH ↓"; }
+body.pdrs-managed-video.pdrs-has-lyrics .pdu-single > header::after { content: "WATCH · LYRICS ↓"; }
+
 .pdrs-pdu-embed {
     background: var(--pdu-surface, #101015);
     border: 1px solid #343442;

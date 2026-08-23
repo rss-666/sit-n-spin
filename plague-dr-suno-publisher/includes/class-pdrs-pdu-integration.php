@@ -19,6 +19,7 @@ final class PDRS_PDU_Integration {
         add_action( 'trashed_post', array( $this, 'trash_linked_track' ) );
         add_action( 'untrashed_post', array( $this, 'restore_linked_track' ) );
         add_filter( 'the_content', array( $this, 'single_track_player' ), 15 );
+        add_filter( 'body_class', array( $this, 'body_classes' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'frontend_assets' ), 20 );
         add_action( 'wp_footer', array( $this, 'modal' ) );
     }
@@ -171,6 +172,29 @@ final class PDRS_PDU_Integration {
                 wp_update_post( array( 'ID' => $linked_id, 'post_status' => 'draft' ) );
             }
         }
+    }
+
+    /**
+     * Scope theme-layout refinements to native entries managed by this plugin.
+     *
+     * @param string[] $classes Existing body classes.
+     * @return string[]
+     */
+    public function body_classes( array $classes ): array {
+        if ( ! is_singular( array( self::THEME_POST_TYPE, self::VIDEO_POST_TYPE ) ) ) {
+            return $classes;
+        }
+        $native_id = get_queried_object_id();
+        if ( ! absint( get_post_meta( $native_id, '_pdrs_managed_song_id', true ) ) ) {
+            return $classes;
+        }
+        $song_id   = absint( get_post_meta( $native_id, '_pdrs_managed_song_id', true ) );
+        $classes[] = 'pdrs-managed-native';
+        $classes[] = self::VIDEO_POST_TYPE === get_post_type( $native_id ) ? 'pdrs-managed-video' : 'pdrs-managed-track';
+        if ( '' !== trim( (string) get_post_meta( $song_id, '_pdrs_lyrics', true ) ) ) {
+            $classes[] = 'pdrs-has-lyrics';
+        }
+        return array_values( array_unique( $classes ) );
     }
 
     /**

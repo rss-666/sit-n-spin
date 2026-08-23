@@ -228,5 +228,15 @@ pdrs_test( 'Published native page still renders player and lyrics if managed sta
     pdrs_assert( str_contains( $html, 'The street remembers' ) );
 } );
 
+pdrs_test( 'Managed native pages receive scoped centered-header and lyrics cue classes', static function (): void {
+    $track_id = PDRS_PDU_Integration::linked_track_id( 300 );
+    $GLOBALS['pdrs_queried_id'] = $track_id;
+    $classes = ( new PDRS_PDU_Integration() )->body_classes( array( 'existing-class' ) );
+    pdrs_assert( in_array( 'existing-class', $classes, true ) );
+    pdrs_assert( in_array( 'pdrs-managed-native', $classes, true ) );
+    pdrs_assert( in_array( 'pdrs-managed-track', $classes, true ) );
+    pdrs_assert( in_array( 'pdrs-has-lyrics', $classes, true ) );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed ? 1 : 0 );

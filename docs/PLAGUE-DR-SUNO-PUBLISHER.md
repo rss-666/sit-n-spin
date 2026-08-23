@@ -13,7 +13,7 @@ The plugin is an adapter. It does not modify theme files.
 
 ## Recommended Theme Workflow
 
-1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.3.1+.
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.3.2+.
 2. Open **Plague Dr Music → Add from Suno**.
 3. Choose **Theme Soundtrack**, **Theme Music Video**, **Theme Soundtrack + Music Video**, or page placement.
 4. Provide a Suno URL and/or local Media Library audio for Soundtrack playback.
