@@ -11,11 +11,11 @@ The plugin is an adapter. It does not modify theme files.
 
 ## Recommended Theme Workflow
 
-1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.1.0+.
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.2.0+.
 2. Open **Plague Dr Music → Add from Suno**.
 3. Paste a full public `https://suno.com/song/{uuid}` URL.
 4. Keep **Publishing mode** set to **Plague Dr Universe Soundtrack**.
-5. Review or enter the title, description/credits/lyrics, artwork, album, duration, genre, and buy/stream URL.
+5. Review or enter the title, description/credits, dedicated lyrics, artwork, album, duration, genre, and buy/stream URL.
 6. Optionally choose a direct audio file from Media Library.
 7. Save as Draft, review the linked Soundtrack, and publish when ready.
 
@@ -61,6 +61,9 @@ Each managed song owns one linked `pdu_track`. The plugin synchronizes:
 | Buy/stream URL | `pdu_buy_url` |
 | Direct local audio | `pdu_audio_url` |
 | Imported artwork | Featured image |
+| Dedicated lyrics | Plugin-rendered Lyrics section on the linked track page |
+
+Lyrics are stored separately from descriptions and credits. They are excluded from homepage rows and archive excerpts, displayed in a theme-styled section on native Soundtrack pages, and shown in a collapsible section for generic player cards. Line breaks and safe basic formatting are preserved.
 
 Bidirectional protected metadata prevents duplicate Soundtrack records. Updating the managed song updates its existing track. Switching back to page placement moves the linked Soundtrack to Draft rather than deleting editorial work.
 

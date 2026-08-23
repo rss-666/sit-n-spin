@@ -4,7 +4,7 @@ Tags: suno, music, audio, embed, soundtracks
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,7 @@ Soundtrack mode synchronizes title, description, excerpt, status, album, duratio
 
 == Installation ==
 
-1. Upload `plague-dr-suno-publisher-1.1.0.zip` through Plugins -> Add New Plugin -> Upload Plugin.
+1. Upload `plague-dr-suno-publisher-1.2.0.zip` through Plugins -> Add New Plugin -> Upload Plugin.
 2. Activate Plague Dr Suno Publisher.
 3. Open Plague Dr Music -> Add from Suno.
 4. Paste a public full Suno song URL.
@@ -72,6 +72,12 @@ Suno or its anti-bot layer may prevent server-side short-link resolution. Open i
 A metadata request is sent to Suno only when a song is added and public title, description, or artwork is needed. The hosted iframe is loaded on an individual track page or after a visitor presses a hosted track's play button. No Suno account credential or API key is collected.
 
 == Changelog ==
+
+= 1.2.0 =
+* Added a dedicated lyrics editor separate from descriptions and credits.
+* Added collapsible lyrics to generic song cards.
+* Added a theme-styled Lyrics section to native Soundtrack pages with either local or hosted playback.
+* Kept lyrics out of homepage cards and archive excerpts.
 
 = 1.1.0 =
 * Added native The Plague Dr Universe `pdu_track` synchronization.

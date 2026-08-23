@@ -73,6 +73,7 @@ pdrs_test( 'Player HTML uses a generated Suno embed and escapes editable content
     $GLOBALS['pdrs_meta'][101] = array(
         '_pdrs_song_id' => $uuid,
         '_pdrs_artwork_url' => 'https://cdn2.suno.ai/cover.jpeg',
+        '_pdrs_lyrics' => "Verse one\n\nSafe refrain <script>alert(3)</script>",
         '_pdrs_position' => 'after',
         '_pdrs_destination_id' => 10,
     );
@@ -80,6 +81,8 @@ pdrs_test( 'Player HTML uses a generated Suno embed and escapes editable content
     pdrs_assert( str_contains( $html, 'https://suno.com/embed/' . $uuid ) );
     pdrs_assert( str_contains( $html, 'Plague &lt;script&gt;alert(1)&lt;/script&gt; Song' ) );
     pdrs_assert( ! str_contains( $html, '<script>' ) );
+    pdrs_assert( str_contains( $html, '<summary>Lyrics</summary>' ) );
+    pdrs_assert( str_contains( $html, 'Safe refrain alert(3)' ) );
     pdrs_assert( str_contains( $html, 'loading="lazy"' ) );
 } );
 
@@ -129,6 +132,7 @@ pdrs_test( 'Theme Soundtrack sync creates one native entry and updates it withou
         '_pdrs_placement_mode' => PDRS_PDU_Integration::MODE,
         '_pdrs_album' => 'Emerald Rot',
         '_pdrs_duration' => '4:12',
+        '_pdrs_lyrics' => "Rain keeps falling\n\nThe street remembers",
         '_pdrs_audio_url' => 'https://plaguedr.test/uploads/rain.mp3',
         '_pdrs_import_artwork' => 0,
     );
@@ -150,13 +154,16 @@ pdrs_test( 'Theme track uses native audio when present and Suno fallback when ab
     $track_id = PDRS_PDU_Integration::linked_track_id( 300 );
     $GLOBALS['pdrs_queried_id'] = $track_id;
     $integration = new PDRS_PDU_Integration();
-    pdrs_same( '<p>Track body</p>', $integration->single_track_player( '<p>Track body</p>' ) );
+    $native = $integration->single_track_player( '<p>Track body</p>' );
+    pdrs_assert( ! str_contains( $native, 'https://suno.com/embed/' ) );
+    pdrs_assert( str_contains( $native, '<h2 id="pdrs-lyrics-300">Lyrics</h2>' ) );
 
     delete_post_meta( 300, '_pdrs_audio_url' );
     PDRS_PDU_Integration::sync_song( 300 );
     $fallback = $integration->single_track_player( '<p>Track body</p>' );
     pdrs_assert( str_contains( $fallback, 'https://suno.com/embed/' ) );
     pdrs_assert( str_contains( $fallback, '<p>Track body</p>' ) );
+    pdrs_assert( str_contains( $fallback, 'The street remembers' ) );
 } );
 
 echo "\n{$passed} passed, {$failed} failed\n";

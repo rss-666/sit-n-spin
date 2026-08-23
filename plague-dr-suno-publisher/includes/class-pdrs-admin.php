@@ -67,8 +67,10 @@ final class PDRS_Admin {
                     <p class="description"><?php esc_html_e( 'Full /song/ and /embed/ links work best. The plugin also attempts to resolve Suno /s/ share links.', 'plague-dr-suno-publisher' ); ?></p>
                     <p><label for="pdrs-title"><strong><?php esc_html_e( 'Song title', 'plague-dr-suno-publisher' ); ?></strong></label><br>
                         <input id="pdrs-title" class="large-text" type="text" name="song_title" placeholder="<?php esc_attr_e( 'Leave blank to fetch the public Suno title', 'plague-dr-suno-publisher' ); ?>"></p>
-                    <p><label for="pdrs-description"><strong><?php esc_html_e( 'Description, credits, or lyrics', 'plague-dr-suno-publisher' ); ?></strong></label><br>
-                        <textarea id="pdrs-description" class="large-text" name="song_description" rows="6" placeholder="<?php esc_attr_e( 'Optional; you can edit this later', 'plague-dr-suno-publisher' ); ?>"></textarea></p>
+                    <p><label for="pdrs-description"><strong><?php esc_html_e( 'Description and credits', 'plague-dr-suno-publisher' ); ?></strong></label><br>
+                        <textarea id="pdrs-description" class="large-text" name="song_description" rows="5" placeholder="<?php esc_attr_e( 'Short description, production notes, performers, or credits', 'plague-dr-suno-publisher' ); ?>"></textarea></p>
+                    <p><label for="pdrs-lyrics"><strong><?php esc_html_e( 'Lyrics', 'plague-dr-suno-publisher' ); ?></strong></label><br>
+                        <textarea id="pdrs-lyrics" class="large-text" name="lyrics" rows="10" placeholder="<?php esc_attr_e( 'Verse 1…', 'plague-dr-suno-publisher' ); ?>"></textarea><br><span class="description"><?php esc_html_e( 'Optional. Line breaks are preserved and lyrics remain separate from archive excerpts.', 'plague-dr-suno-publisher' ); ?></span></p>
                     <p><label for="pdrs-mode"><strong><?php esc_html_e( 'Publishing mode', 'plague-dr-suno-publisher' ); ?></strong></label><br>
                         <select id="pdrs-mode" name="placement_mode" data-pdrs-mode><option value="pdu_track" <?php disabled( ! $pdu_available ); ?>><?php esc_html_e( 'Plague Dr Universe Soundtrack (recommended)', 'plague-dr-suno-publisher' ); ?></option><option value="destination" <?php selected( ! $pdu_available ); ?>><?php esc_html_e( 'Place player on an existing page or post', 'plague-dr-suno-publisher' ); ?></option></select></p>
                     <?php if ( ! $pdu_available ) : ?><p class="notice notice-warning inline"><?php esc_html_e( 'The active theme does not currently expose the pdu_track Soundtrack type, so page placement will be used.', 'plague-dr-suno-publisher' ); ?></p><?php endif; ?>
@@ -136,6 +138,7 @@ final class PDRS_Admin {
         $metadata    = PDRS_Metadata::fetch( $resolved['song_id'] );
         $title       = sanitize_text_field( wp_unslash( (string) ( $_POST['song_title'] ?? '' ) ) );
         $description = wp_kses_post( wp_unslash( (string) ( $_POST['song_description'] ?? '' ) ) );
+        $lyrics      = wp_kses_post( wp_unslash( (string) ( $_POST['lyrics'] ?? '' ) ) );
         $artwork     = PDRS_Metadata::image_url( wp_unslash( (string) ( $_POST['artwork_url'] ?? '' ) ) );
         if ( '' === $title ) {
             $title = $metadata['title'] ?: sprintf( /* translators: %s: shortened song ID. */ __( 'Suno Song %s', 'plague-dr-suno-publisher' ), substr( $resolved['song_id'], 0, 8 ) );
@@ -171,6 +174,7 @@ final class PDRS_Admin {
         update_post_meta( $post_id, '_pdrs_destination_id', $destination_id );
         update_post_meta( $post_id, '_pdrs_position', 'before' === ( $_POST['position'] ?? '' ) ? 'before' : 'after' );
         update_post_meta( $post_id, '_pdrs_artwork_url', $artwork );
+        update_post_meta( $post_id, '_pdrs_lyrics', $lyrics );
         update_post_meta( $post_id, '_pdrs_album', sanitize_text_field( wp_unslash( (string) ( $_POST['album'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_duration', PDRS_PDU_Integration::duration( wp_unslash( (string) ( $_POST['duration'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_genre', sanitize_text_field( wp_unslash( (string) ( $_POST['genre'] ?? '' ) ) ) );
@@ -205,6 +209,14 @@ final class PDRS_Admin {
             PDRS_Plugin::POST_TYPE,
             'side',
             'high'
+        );
+        add_meta_box(
+            'pdrs-lyrics',
+            __( 'Lyrics', 'plague-dr-suno-publisher' ),
+            array( $this, 'lyrics_meta_box_html' ),
+            PDRS_Plugin::POST_TYPE,
+            'normal',
+            'default'
         );
     }
 
@@ -241,6 +253,14 @@ final class PDRS_Admin {
         <p><label for="pdrs-song-artwork"><strong><?php esc_html_e( 'Artwork URL', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-artwork" class="widefat" type="url" name="pdrs_artwork_url" value="<?php echo esc_attr( $artwork ); ?>"></p>
         <p><strong><?php esc_html_e( 'Shortcode', 'plague-dr-suno-publisher' ); ?></strong><br><code>[plague_dr_song id="<?php echo esc_attr( (string) $post->ID ); ?>"]</code></p>
         <?php if ( $source ) : ?><p><a href="<?php echo esc_url( $source ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open song on Suno', 'plague-dr-suno-publisher' ); ?></a></p><?php endif; ?>
+        <?php
+    }
+
+    public function lyrics_meta_box_html( WP_Post $post ): void {
+        $lyrics = (string) get_post_meta( $post->ID, '_pdrs_lyrics', true );
+        ?>
+        <p class="description"><?php esc_html_e( 'Lyrics are kept separate from the description, excluded from archive excerpts, and shown in a dedicated section on the public song or Soundtrack page.', 'plague-dr-suno-publisher' ); ?></p>
+        <textarea class="widefat pdrs-lyrics-editor" name="pdrs_lyrics" rows="16" placeholder="<?php esc_attr_e( 'Verse 1…', 'plague-dr-suno-publisher' ); ?>"><?php echo esc_textarea( $lyrics ); ?></textarea>
         <?php
     }
 
@@ -281,6 +301,7 @@ final class PDRS_Admin {
         }
         update_post_meta( $post_id, '_pdrs_position', 'before' === ( $_POST['pdrs_position'] ?? '' ) ? 'before' : 'after' );
         update_post_meta( $post_id, '_pdrs_artwork_url', PDRS_Metadata::image_url( wp_unslash( (string) ( $_POST['pdrs_artwork_url'] ?? '' ) ) ) );
+        update_post_meta( $post_id, '_pdrs_lyrics', wp_kses_post( wp_unslash( (string) ( $_POST['pdrs_lyrics'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_album', sanitize_text_field( wp_unslash( (string) ( $_POST['pdrs_album'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_duration', PDRS_PDU_Integration::duration( wp_unslash( (string) ( $_POST['pdrs_duration'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_genre', sanitize_text_field( wp_unslash( (string) ( $_POST['pdrs_genre'] ?? '' ) ) ) );

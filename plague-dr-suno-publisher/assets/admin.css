@@ -52,6 +52,12 @@
 
 [hidden] { display: none !important; }
 
+.pdrs-lyrics-editor {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    line-height: 1.65;
+    min-height: 320px;
+}
+
 .pdrs-card code {
     display: inline-block;
     max-width: 100%;

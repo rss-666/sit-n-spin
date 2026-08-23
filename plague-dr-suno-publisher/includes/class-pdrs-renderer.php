@@ -114,11 +114,27 @@ final class PDRS_Renderer {
                 <div class="pdrs-song__player">
                     <iframe src="<?php echo esc_url( $details['embed_url'] ); ?>" title="<?php echo esc_attr( $player_title ); ?>" loading="lazy" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 </div>
+                <?php echo self::lyrics_html( $post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                 <p class="pdrs-song__source"><a href="<?php echo esc_url( $details['source_url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Listen on Suno', 'plague-dr-suno-publisher' ); ?></a></p>
             </div>
         </article>
         <?php
         return (string) ob_get_clean();
+    }
+
+    /**
+     * Render editor-controlled lyrics separately from descriptions/excerpts.
+     */
+    public static function lyrics_html( int $post_id, bool $theme_layout = false ): string {
+        $lyrics = trim( (string) get_post_meta( $post_id, '_pdrs_lyrics', true ) );
+        if ( '' === $lyrics ) {
+            return '';
+        }
+        $body = wpautop( wp_kses_post( $lyrics ) );
+        if ( $theme_layout ) {
+            return '<section class="pdrs-pdu-lyrics" aria-labelledby="pdrs-lyrics-' . esc_attr( (string) $post_id ) . '"><p class="pdrs-pdu-embed__eyebrow">' . esc_html__( 'Words from the record', 'plague-dr-suno-publisher' ) . '</p><h2 id="pdrs-lyrics-' . esc_attr( (string) $post_id ) . '">' . esc_html__( 'Lyrics', 'plague-dr-suno-publisher' ) . '</h2><div class="pdrs-pdu-lyrics__body">' . $body . '</div></section>';
+        }
+        return '<details class="pdrs-song__lyrics"><summary>' . esc_html__( 'Lyrics', 'plague-dr-suno-publisher' ) . '</summary><div class="pdrs-song__lyrics-body">' . $body . '</div></details>';
     }
 
     private static function group( string $songs ): string {

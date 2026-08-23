@@ -140,14 +140,13 @@ final class PDRS_PDU_Integration {
             return $content;
         }
         $track_id = get_queried_object_id();
-        if ( get_post_meta( $track_id, 'pdu_audio_url', true ) ) {
-            return $content;
-        }
-        $song_id = absint( get_post_meta( $track_id, '_pdrs_managed_song_id', true ) );
+        $song_id  = absint( get_post_meta( $track_id, '_pdrs_managed_song_id', true ) );
         if ( ! $song_id || 'publish' !== get_post_status( $song_id ) ) {
             return $content;
         }
-        return self::hosted_player_html( $song_id ) . $content;
+        $player = get_post_meta( $track_id, 'pdu_audio_url', true ) ? '' : self::hosted_player_html( $song_id );
+        $lyrics = PDRS_Renderer::lyrics_html( $song_id, true );
+        return $player . $content . $lyrics;
     }
 
     /**

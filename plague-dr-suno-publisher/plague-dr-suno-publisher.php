@@ -3,7 +3,7 @@
  * Plugin Name:       Plague Dr Suno Publisher
  * Plugin URI:        https://plaguedr.online/
  * Description:       Publish public Suno songs to WordPress pages or native Plague Dr Universe Soundtrack entries.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Plague Dr
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PDRS_VERSION', '1.1.0' );
+define( 'PDRS_VERSION', '1.2.0' );
 define( 'PDRS_PLUGIN_FILE', __FILE__ );
 define( 'PDRS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PDRS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
