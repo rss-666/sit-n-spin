@@ -1,0 +1,91 @@
+.pdrs-admin {
+    max-width: 1240px;
+}
+
+.pdrs-lede {
+    font-size: 16px;
+    max-width: 850px;
+}
+
+.pdrs-layout {
+    align-items: start;
+    display: grid;
+    gap: 22px;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr);
+}
+
+.pdrs-result {
+    align-items: flex-start;
+    background: #edf9f0;
+    border: 1px solid #8bc59a;
+    border-left: 5px solid #1e8c45;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: auto 1fr;
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.pdrs-result h2 { margin: 0 0 5px; }
+.pdrs-result p { margin: 4px 0 12px; }
+.pdrs-result__check { align-items: center; background: #1e8c45; border-radius: 50%; color: #fff; display: inline-flex; font-size: 20px; font-weight: 800; height: 36px; justify-content: center; width: 36px; }
+.pdrs-result__actions { align-items: center; display: flex; flex-wrap: wrap; gap: 7px; }
+.pdrs-result__native { display: inline-flex; gap: 4px; }
+
+.pdrs-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    box-sizing: border-box;
+    margin: 18px 0;
+    padding: 22px;
+}
+
+.pdrs-card h2:first-child {
+    margin-top: 0;
+}
+
+.pdrs-two-column {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(180px, .6fr);
+}
+
+.pdrs-safety {
+    border-left: 4px solid #7f54b3;
+}
+
+.pdrs-theme-fields {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-left: 4px solid #b3121b;
+    margin: 16px 0;
+    padding: 16px;
+}
+
+.pdrs-theme-fields h3 { margin-top: 0; }
+.pdrs-media-field { align-items: center; display: flex; gap: 8px; }
+.pdrs-media-field input { flex: 1; }
+
+[hidden] { display: none !important; }
+
+.pdrs-lyrics-editor {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    line-height: 1.65;
+    min-height: 320px;
+}
+
+.pdrs-card code {
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    padding: 5px 8px;
+}
+
+@media (max-width: 900px) {
+    .pdrs-layout,
+    .pdrs-two-column {
+        grid-template-columns: 1fr;
+    }
+}

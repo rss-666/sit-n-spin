@@ -42,7 +42,7 @@ No production PHP packages or JavaScript frameworks are required.
 
 ### From the installable ZIP
 
-1. Build or download `the-runbook-briefings-1.0.0.zip`.
+1. Build or download `the-runbook-briefings-1.0.3.zip`.
 2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**.
 3. Upload the ZIP, install it, and activate **The Runbook Briefings**.
 4. Open **Content Briefings → Settings** and review the defaults.
@@ -103,9 +103,40 @@ Do not accept an endpoint from an untrusted user. WordPress safe HTTP APIs and H
 3. Optionally enter comma- or newline-delimited keywords. An item passes when any keyword appears in its title or short description.
 4. Optionally enter feed category labels. An item passes when any configured category matches.
 5. Add reliability/editorial notes and select a frequency.
-6. Save the source, then use **Run import now** on the dashboard.
+6. Save the source, then choose **Fetch Now** beside that source to test it immediately. Use **Run import now** on the dashboard when you want to fetch all enabled sources.
 
 Private, loopback, local, malformed, and non-HTTP feed addresses are rejected through WordPress URL validation. Redirects are limited to three. A successful fetch updates source health even when every item is filtered.
+
+### Recommended test feeds
+
+Start with the official WordPress security feed. For the first import, leave **Keywords** and **Categories** blank so filters cannot hide otherwise valid items.
+
+| Suggested name | Feed URL | Focus |
+|---|---|---|
+| WordPress.org Security | `https://wordpress.org/news/category/security/feed/` | Official WordPress security releases and notices |
+| Wordfence Security | `https://www.wordfence.com/blog/feed/` | WordPress vulnerabilities, malware, firewall research, and weekly reports |
+| Sucuri Security Blog | `https://blog.sucuri.net/feed` | Website security, malware, hardening, and vulnerability roundups |
+| WordPress News | `https://wordpress.org/news/feed/` | Official general WordPress releases and community news |
+| WP Tavern | `https://wptavern.com/feed` | Broad WordPress ecosystem news, products, and interviews |
+
+Recommended first-test source:
+
+```text
+Name: WordPress.org Security
+Feed URL: https://wordpress.org/news/category/security/feed/
+Enabled: Yes
+Keywords: (leave blank)
+Categories: (leave blank)
+Frequency: Hourly
+```
+
+After confirming that import works, useful keyword filters include:
+
+```text
+WordPress, vulnerability, security, exploit, malware, plugin, patch, update
+```
+
+Run the same feed twice to exercise duplicate detection. The second run should not create another active queue item for an identical normalized URL. Add feeds only after reviewing their reliability and usage terms; inclusion here is a testing suggestion, not an endorsement of every article.
 
 ## Editorial Workflow
 
@@ -189,6 +220,8 @@ The plugin uses an overlap lock and each source’s due time. A per-source frequ
 
 ## Development and Testing
 
+For hands-on WordPress acceptance testing, open [`runbook-plugin-test-checklist.html`](runbook-plugin-test-checklist.html) in a browser. The interactive checklist autosaves locally, tracks Pass/Fail/Blocked/Skipped results, includes known-good RSS feeds, and generates a Markdown report that can be pasted back into an Arena conversation. Do not enter credentials or private customer data in the checklist.
+
 Install development dependencies:
 
 ```bash
@@ -228,7 +261,7 @@ Run:
 ./bin/package.sh
 ```
 
-The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.0.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
+The script lints plugin PHP when `php` is available and writes `the-runbook-briefings-1.0.3.zip` with one top-level plugin directory. Development files, credentials, tests, and repository metadata are excluded.
 
 ## Troubleshooting
 
@@ -242,6 +275,18 @@ See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for feed, cron, provider,
 - Internal-link candidates are drawn from the 20 most recent published posts; editors can enter other local links manually.
 - WP-Cron timing depends on site traffic unless a system scheduler is configured.
 - Factual quality still requires a human editor; a short feed excerpt may be insufficient for some stories.
+
+## Additional Standalone Plugin
+
+This repository also includes **Plague Dr Suno Publisher** in `plague-dr-suno-publisher/`. It manages Suno, local-audio, YouTube, Vimeo, and direct-video music releases. Theme modes create/synchronize native `pdu_track` Soundtracks, `pdu_video` Music Videos, or both from one shared title, description, lyrics, duration, artwork, and status record—without modifying theme files. Generic page placement and shortcodes remain available on other themes.
+
+Build its installable package with:
+
+```bash
+./bin/package-suno.sh
+```
+
+See [docs/PLAGUE-DR-SUNO-PUBLISHER.md](docs/PLAGUE-DR-SUNO-PUBLISHER.md) for usage, privacy, and troubleshooting.
 
 ## License
 

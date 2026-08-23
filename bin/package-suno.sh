@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PLUGIN="the-runbook-briefings"
+PLUGIN="plague-dr-suno-publisher"
 VERSION="$(sed -n 's/^ \* Version:[[:space:]]*//p' "$ROOT/$PLUGIN/$PLUGIN.php" | head -1 | tr -d '\r')"
 ARCHIVE="$ROOT/${PLUGIN}-${VERSION}.zip"
 

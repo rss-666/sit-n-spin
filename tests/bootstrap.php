@@ -44,6 +44,8 @@ function esc_url_raw( $url, $protocols = null ): string {
 }
 function esc_url( $url ): string { return htmlspecialchars( esc_url_raw( $url ), ENT_QUOTES, 'UTF-8' ); }
 function esc_html( $value ): string { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+function esc_attr( $value ): string { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+function esc_textarea( $value ): string { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 function wp_strip_all_tags( $value, $remove_breaks = false ): string { return trim( strip_tags( (string) $value ) ); }
 function wp_kses_post( $value ): string { return strip_tags( (string) $value, '<p><a><strong><em><ul><ol><li><code>' ); }
 function wpautop( $value ): string { return '<p>' . str_replace( "\n\n", '</p><p>', (string) $value ) . '</p>'; }

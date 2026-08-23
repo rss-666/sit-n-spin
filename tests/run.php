@@ -152,5 +152,78 @@ trb_test( 'Review action rejects invalid nonce', static function (): void {
     throw new RuntimeException( 'Invalid nonce was accepted.' );
 } );
 
+require_once dirname( __DIR__ ) . '/the-runbook-briefings/includes/class-trb-admin.php';
+trb_test( 'Brand-new item renders empty briefing textareas without a fatal', static function (): void {
+    $reflection = new ReflectionClass( TRB_Admin::class );
+    $admin      = $reflection->newInstanceWithoutConstructor();
+    $method     = $reflection->getMethod( 'editor_textarea' );
+    $method->setAccessible( true );
+    ob_start();
+    $method->invoke( $admin, 'factual_summary', 'Factual summary', null, 'Source-supported facts.' );
+    $html = (string) ob_get_clean();
+    trb_assert( str_contains( $html, 'name="briefing[factual_summary]"' ) );
+    trb_assert( str_contains( $html, '<textarea' ) );
+} );
+
+// Minimal collaborators for focused single-source importer tests.
+$GLOBALS['trb_test_transients'] = array();
+function get_transient( string $key ) { return $GLOBALS['trb_test_transients'][ $key ] ?? false; }
+function set_transient( string $key, $value, int $expiration ): bool { $GLOBALS['trb_test_transients'][ $key ] = $value; return true; }
+function delete_transient( string $key ): bool { unset( $GLOBALS['trb_test_transients'][ $key ] ); return true; }
+function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): bool { return true; }
+function remove_filter( string $hook, $callback, int $priority = 10 ): bool { return true; }
+function fetch_feed( string $url ) { return new TRB_Test_Empty_Feed(); }
+
+final class TRB_Test_Empty_Feed {
+    public function get_items( int $start = 0, int $end = 0 ): array { return array(); }
+}
+final class TRB_Source_Repository {
+    public int $successful_source_id = 0;
+    public function all( bool $enabled_only = false ): array { return array(); }
+    public function record_success( int $id ): void { $this->successful_source_id = $id; }
+    public function record_error( int $id, string $message ): void {}
+}
+final class TRB_Item_Repository {}
+final class TRB_Logger {
+    public static array $events = array();
+    public static function log( string $level, string $event, string $message, array $context = array(), ?int $source_id = null, ?int $item_id = null ): void { self::$events[] = $event; }
+    public static function prune(): void {}
+}
+
+require_once dirname( __DIR__ ) . '/the-runbook-briefings/includes/class-trb-importer.php';
+
+trb_test( 'Fetch Now runs one selected source and releases its overlap lock', static function (): void {
+    $sources = new TRB_Source_Repository();
+    $items   = new TRB_Item_Repository();
+    $source  = (object) array(
+        'id' => 77,
+        'name' => 'Disabled test feed',
+        'feed_url' => 'https://example.com/feed/',
+        'enabled' => 0,
+        'keywords' => '',
+        'categories' => '',
+    );
+    $result = ( new TRB_Importer( $sources, $items ) )->run_source( $source );
+    trb_assert( is_array( $result ) );
+    trb_same( 1, $result['sources'] );
+    trb_same( 77, $sources->successful_source_id );
+    trb_assert( ! get_transient( 'trb_import_lock' ) );
+    trb_assert( in_array( 'manual_source_import_complete', TRB_Logger::$events, true ) );
+} );
+
+trb_test( 'Fetch Now refuses to overlap an active importer run', static function (): void {
+    set_transient( 'trb_import_lock', 1, MINUTE_IN_SECONDS );
+    $result = ( new TRB_Importer( new TRB_Source_Repository(), new TRB_Item_Repository() ) )->run_source( (object) array( 'id' => 88 ) );
+    trb_assert( $result instanceof WP_Error );
+    trb_same( 'trb_import_locked', $result->get_error_code() );
+    delete_transient( 'trb_import_lock' );
+} );
+
+trb_test( 'Generate control remains enabled long enough to submit its form', static function (): void {
+    $script = (string) file_get_contents( dirname( __DIR__ ) . '/the-runbook-briefings/assets/admin.js' );
+    trb_assert( str_contains( $script, "actionButton.textContent = 'Generating…'" ) );
+    trb_assert( ! str_contains( $script, 'actionButton.disabled = true' ), 'Generate click handler disables the submit control before default submission.' );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed > 0 ? 1 : 0 );
