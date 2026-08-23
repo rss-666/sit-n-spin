@@ -13,7 +13,7 @@ The plugin is an adapter. It does not modify theme files.
 
 ## Recommended Theme Workflow
 
-1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.3.2+.
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.4.0+.
 2. Open **Plague Dr Music → Add from Suno**.
 3. Choose **Theme Soundtrack**, **Theme Music Video**, **Theme Soundtrack + Music Video**, or page placement.
 4. Provide a Suno URL and/or local Media Library audio for Soundtrack playback.
@@ -65,7 +65,8 @@ Each managed release can own one linked `pdu_track`, one linked `pdu_video`, or 
 | Managed song | Theme Soundtrack |
 |---|---|
 | Title | `post_title` |
-| Description/credits/lyrics | `post_content` and bounded `post_excerpt` |
+| Artist / featured artist | Plugin-rendered highlighted artist credit |
+| Description/credits | `post_content` and bounded `post_excerpt` |
 | Draft/Active status | Native track status |
 | Album/release | `pdu_album` |
 | Duration | `pdu_duration` |
@@ -80,6 +81,7 @@ Video synchronization includes:
 | Managed release | Theme Video Release |
 |---|---|
 | Title | `post_title` |
+| Artist / featured artist | Plugin-rendered highlighted artist credit |
 | Description/credits | `post_content` and bounded `post_excerpt` |
 | Draft/Active status | Native video status |
 | YouTube/Vimeo/direct video | `pdu_video_url` |
@@ -88,7 +90,7 @@ Video synchronization includes:
 | Imported artwork | Featured image |
 | Dedicated lyrics | Plugin-rendered Lyrics section |
 
-Lyrics are stored separately from descriptions and credits. They are excluded from homepage rows and archive excerpts, displayed in theme-styled sections on both native pages, and shown in a collapsible section for generic player cards. Line breaks and safe basic formatting are preserved.
+Artist names are stored separately from descriptions and rendered in the theme's amber accent so featured-artist credits remain visually distinct. Lyrics are stored separately from descriptions and credits, excluded from homepage rows and archive excerpts, and displayed in centered theme-styled reading columns on both native pages (plus a centered collapsible section on generic cards). Line breaks and safe basic formatting are preserved.
 
 Bidirectional protected metadata prevents duplicate Soundtrack and Video records. Switching modes moves unused linked records to Draft rather than deleting editorial work.
 

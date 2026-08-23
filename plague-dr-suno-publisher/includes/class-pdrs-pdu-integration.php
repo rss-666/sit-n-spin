@@ -215,12 +215,13 @@ final class PDRS_PDU_Integration {
         if ( ! $managed_is_public && ! $native_is_public && ! current_user_can( 'edit_post', $song_id ) ) {
             return $content;
         }
+        $artist = PDRS_Renderer::artist_html( $song_id, true );
         $lyrics = PDRS_Renderer::lyrics_html( $song_id, true );
         if ( self::VIDEO_POST_TYPE === get_post_type( $native_id ) ) {
-            return $content . $lyrics;
+            return $artist . $content . $lyrics;
         }
         $player = get_post_meta( $native_id, 'pdu_audio_url', true ) ? '' : self::hosted_player_html( $song_id );
-        return $player . $content . $lyrics;
+        return $artist . $player . $content . $lyrics;
     }
 
     /**

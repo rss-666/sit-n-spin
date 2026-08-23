@@ -73,6 +73,7 @@ pdrs_test( 'Player HTML uses a generated Suno embed and escapes editable content
     $GLOBALS['pdrs_meta'][101] = array(
         '_pdrs_song_id' => $uuid,
         '_pdrs_artwork_url' => 'https://cdn2.suno.ai/cover.jpeg',
+        '_pdrs_artist_name' => 'Featured Artist',
         '_pdrs_lyrics' => "Verse one\n\nSafe refrain <script>alert(3)</script>",
         '_pdrs_position' => 'after',
         '_pdrs_destination_id' => 10,
@@ -82,6 +83,7 @@ pdrs_test( 'Player HTML uses a generated Suno embed and escapes editable content
     pdrs_assert( str_contains( $html, 'Plague &lt;script&gt;alert(1)&lt;/script&gt; Song' ) );
     pdrs_assert( ! str_contains( $html, '<script>' ) );
     pdrs_assert( str_contains( $html, '<summary>Lyrics</summary>' ) );
+    pdrs_assert( str_contains( $html, '<span>By</span> Featured Artist' ) );
     pdrs_assert( str_contains( $html, 'Safe refrain alert(3)' ) );
     pdrs_assert( str_contains( $html, 'loading="lazy"' ) );
 } );
@@ -132,6 +134,7 @@ pdrs_test( 'Theme Soundtrack sync creates one native entry and updates it withou
         '_pdrs_placement_mode' => PDRS_PDU_Integration::MODE,
         '_pdrs_album' => 'Emerald Rot',
         '_pdrs_duration' => '4:12',
+        '_pdrs_artist_name' => 'Plague Dr General',
         '_pdrs_lyrics' => "Rain keeps falling\n\nThe street remembers",
         '_pdrs_audio_url' => 'https://plaguedr.test/uploads/rain.mp3',
         '_pdrs_import_artwork' => 0,
@@ -156,6 +159,7 @@ pdrs_test( 'Theme track uses native audio when present and Suno fallback when ab
     $integration = new PDRS_PDU_Integration();
     $native = $integration->single_track_player( '<p>Track body</p>' );
     pdrs_assert( ! str_contains( $native, 'https://suno.com/embed/' ) );
+    pdrs_assert( str_contains( $native, '<span>Artist</span> Plague Dr General' ) );
     pdrs_assert( str_contains( $native, '<h2 id="pdrs-lyrics-300">Lyrics</h2>' ) );
 
     delete_post_meta( 300, '_pdrs_audio_url' );
@@ -236,6 +240,9 @@ pdrs_test( 'Managed native pages receive scoped centered-header and lyrics cue c
     pdrs_assert( in_array( 'pdrs-managed-native', $classes, true ) );
     pdrs_assert( in_array( 'pdrs-managed-track', $classes, true ) );
     pdrs_assert( in_array( 'pdrs-has-lyrics', $classes, true ) );
+    $css = (string) file_get_contents( dirname( __DIR__ ) . '/plague-dr-suno-publisher/assets/player.css' );
+    pdrs_assert( str_contains( $css, '.pdrs-pdu-lyrics { border-top: 1px solid #343442; margin-top: 2.5rem; padding-top: 2rem; text-align: center;' ) );
+    pdrs_assert( str_contains( $css, '.pdrs-pdu-artist { color: var(--pdu-amber, #c8912a);' ) );
 } );
 
 echo "\n{$passed} passed, {$failed} failed\n";

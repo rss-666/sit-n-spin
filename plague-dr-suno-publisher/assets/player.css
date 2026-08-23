@@ -34,6 +34,8 @@
 
 .pdrs-song__body { min-width: 0; }
 .pdrs-song__title { color: inherit; font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.15; margin: 0 0 .75rem; }
+.pdrs-song__artist { color: #d5b7ff; font-size: .9rem; font-weight: 700; letter-spacing: .04em; margin: -.25rem 0 .85rem; }
+.pdrs-song__artist span { color: rgba(255,255,255,.58); font-weight: 500; }
 .pdrs-song__description { color: rgba(255, 255, 255, .78); margin-bottom: 1rem; }
 .pdrs-song__description > :first-child { margin-top: 0; }
 .pdrs-song__player { background: #000; border-radius: 10px; min-height: 240px; overflow: hidden; position: relative; }
@@ -41,8 +43,8 @@
 .pdrs-song__source { font-size: .875rem; margin: .75rem 0 0; text-align: right; }
 .pdrs-song__source a { color: #d5b7ff; }
 .pdrs-song__lyrics { border-top: 1px solid rgba(255,255,255,.14); margin-top: 1rem; padding-top: .85rem; }
-.pdrs-song__lyrics summary { color: #d5b7ff; cursor: pointer; font-weight: 700; }
-.pdrs-song__lyrics-body { color: rgba(255,255,255,.82); margin-top: 1rem; white-space: normal; }
+.pdrs-song__lyrics summary { color: #d5b7ff; cursor: pointer; font-weight: 700; text-align: center; }
+.pdrs-song__lyrics-body { color: rgba(255,255,255,.82); margin: 1rem auto 0; max-width: 46rem; text-align: center; white-space: normal; }
 .pdrs-song__lyrics-body p { margin: 0 0 1rem; }
 
 /* Native adapter for The Plague Dr Universe theme. */
@@ -107,9 +109,11 @@ body.pdrs-managed-video.pdrs-has-lyrics .pdu-single > header::after { content: "
 .pdrs-pdu-embed iframe { border: 0; display: block; height: 240px; width: 100%; }
 .pdrs-pdu-embed > p:last-child { font-size: .8rem; margin: .75rem 0 0; text-align: right; }
 .pdrs-pdu-embed a { color: var(--pdu-amber, #c8912a); }
-.pdrs-pdu-lyrics { border-top: 1px solid #343442; margin-top: 2.5rem; padding-top: 2rem; }
+.pdrs-pdu-artist { color: var(--pdu-amber, #c8912a); font-family: Oswald, Impact, sans-serif; font-size: clamp(1rem,2.5vw,1.35rem); font-weight: 500; letter-spacing: .08em; margin: 0 auto 1.5rem; text-align: center; text-transform: uppercase; }
+.pdrs-pdu-artist span { color: #8d877c; font-size: .72em; letter-spacing: .18em; }
+.pdrs-pdu-lyrics { border-top: 1px solid #343442; margin-top: 2.5rem; padding-top: 2rem; text-align: center; }
 .pdrs-pdu-lyrics h2 { color: var(--pdu-bone, #f1ede4); font-family: Oswald, Impact, sans-serif; font-size: clamp(1.6rem,4vw,2.5rem); margin: 0 0 1.5rem; text-transform: uppercase; }
-.pdrs-pdu-lyrics__body { color: #ddd7cb; line-height: 1.9; }
+.pdrs-pdu-lyrics__body { color: #ddd7cb; line-height: 1.9; margin-left: auto; margin-right: auto; max-width: 46rem; }
 .pdrs-pdu-lyrics__body p { margin: 0 0 1.35rem; }
 
 .pdrs-pdu-dialog {

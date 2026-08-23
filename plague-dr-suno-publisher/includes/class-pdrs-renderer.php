@@ -108,6 +108,7 @@ final class PDRS_Renderer {
             <?php endif; ?>
             <div class="pdrs-song__body">
                 <h2 class="pdrs-song__title"><?php echo esc_html( $title ); ?></h2>
+                <?php echo self::artist_html( $post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                 <?php if ( '' !== trim( (string) $song->post_content ) ) : ?>
                     <div class="pdrs-song__description"><?php echo wpautop( wp_kses_post( $song->post_content ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
                 <?php endif; ?>
@@ -120,6 +121,20 @@ final class PDRS_Renderer {
         </article>
         <?php
         return (string) ob_get_clean();
+    }
+
+    /**
+     * Render a dedicated artist credit instead of mixing it into body copy.
+     */
+    public static function artist_html( int $post_id, bool $theme_layout = false ): string {
+        $artist = trim( sanitize_text_field( (string) get_post_meta( $post_id, '_pdrs_artist_name', true ) ) );
+        if ( '' === $artist ) {
+            return '';
+        }
+        if ( $theme_layout ) {
+            return '<p class="pdrs-pdu-artist"><span>' . esc_html__( 'Artist', 'plague-dr-suno-publisher' ) . '</span> ' . esc_html( $artist ) . '</p>';
+        }
+        return '<p class="pdrs-song__artist"><span>' . esc_html__( 'By', 'plague-dr-suno-publisher' ) . '</span> ' . esc_html( $artist ) . '</p>';
     }
 
     /**
