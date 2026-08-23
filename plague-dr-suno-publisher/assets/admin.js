@@ -3,7 +3,8 @@
 
     function updateMode( select ) {
         document.querySelectorAll( '[data-pdrs-mode-panel]' ).forEach( function ( panel ) {
-            panel.hidden = panel.dataset.pdrsModePanel !== select.value;
+            const modes = panel.dataset.pdrsModePanel.split( ',' ).map( ( mode ) => mode.trim() );
+            panel.hidden = ! modes.includes( select.value );
         } );
     }
 

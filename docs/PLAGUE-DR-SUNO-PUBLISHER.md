@@ -2,22 +2,24 @@
 
 ## Purpose
 
-Plague Dr Suno Publisher accepts a public Suno song URL and either:
+Plague Dr Suno Publisher manages Suno, local-audio, YouTube, Vimeo, and direct-video music releases. One managed release can:
 
-- creates a native Soundtrack entry for **The Plague Dr Universe** theme; or
-- dynamically places Suno's hosted player on a selected WordPress page/post.
+- create a native Soundtrack (`pdu_track`);
+- create a native Music Video (`pdu_video`);
+- create and synchronize both; or
+- dynamically place Suno's hosted player on another WordPress page/post.
 
 The plugin is an adapter. It does not modify theme files.
 
 ## Recommended Theme Workflow
 
-1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.2.0+.
+1. Install and activate The Plague Dr Universe theme and Plague Dr Suno Publisher 1.3.0+.
 2. Open **Plague Dr Music → Add from Suno**.
-3. Paste a full public `https://suno.com/song/{uuid}` URL.
-4. Keep **Publishing mode** set to **Plague Dr Universe Soundtrack**.
-5. Review or enter the title, description/credits, dedicated lyrics, artwork, album, duration, genre, and buy/stream URL.
-6. Optionally choose a direct audio file from Media Library.
-7. Save as Draft, review the linked Soundtrack, and publish when ready.
+3. Choose **Theme Soundtrack**, **Theme Music Video**, **Theme Soundtrack + Music Video**, or page placement.
+4. Provide a Suno URL and/or local Media Library audio for Soundtrack playback.
+5. Provide a YouTube, Vimeo, or direct `.mp4`/`.webm`/`.mov` URL for Music Video publishing.
+6. Enter the shared title, description/credits, dedicated lyrics, duration, and artwork plus applicable track/video metadata.
+7. Save as Draft, review each linked native entry, and publish when ready.
 
 The linked `pdu_track` then participates naturally in:
 
@@ -26,6 +28,14 @@ The linked `pdu_track` then participates naturally in:
 - the media template's album grouping;
 - individual themed Soundtrack pages;
 - the theme's MusicRecording structured data.
+
+A linked `pdu_video` participates in the homepage video query, `/videos/` archive, individual themed Video Release page, and theme VideoObject structured data. The theme handles YouTube/Vimeo through WordPress oEmbed and direct video files through its native video element.
+
+## YouTube and Video Releases
+
+YouTube and Vimeo URLs are video/webpage sources, never direct audio. The plugin validates them separately and writes them only to `pdu_video_url`. Video-only mode does not require Suno. Both mode creates one Soundtrack and one Video Release, relates each back to the same managed release, and updates rather than duplicates them.
+
+Lyrics remain a single editor-controlled record. They render beneath both linked native pages while staying out of homepage rows and archive excerpts.
 
 ## Hybrid Playback
 
@@ -48,7 +58,7 @@ The iframe is generated only from a UUID-shaped Suno ID. Homepage modal iframes 
 
 ## Synchronized Theme Data
 
-Each managed song owns one linked `pdu_track`. The plugin synchronizes:
+Each managed release can own one linked `pdu_track`, one linked `pdu_video`, or both. Soundtrack synchronization includes:
 
 | Managed song | Theme Soundtrack |
 |---|---|
@@ -63,9 +73,22 @@ Each managed song owns one linked `pdu_track`. The plugin synchronizes:
 | Imported artwork | Featured image |
 | Dedicated lyrics | Plugin-rendered Lyrics section on the linked track page |
 
-Lyrics are stored separately from descriptions and credits. They are excluded from homepage rows and archive excerpts, displayed in a theme-styled section on native Soundtrack pages, and shown in a collapsible section for generic player cards. Line breaks and safe basic formatting are preserved.
+Video synchronization includes:
 
-Bidirectional protected metadata prevents duplicate Soundtrack records. Updating the managed song updates its existing track. Switching back to page placement moves the linked Soundtrack to Draft rather than deleting editorial work.
+| Managed release | Theme Video Release |
+|---|---|
+| Title | `post_title` |
+| Description/credits | `post_content` and bounded `post_excerpt` |
+| Draft/Active status | Native video status |
+| YouTube/Vimeo/direct video | `pdu_video_url` |
+| Duration | `pdu_duration` |
+| Runtime/release note | `pdu_runtime_note` |
+| Imported artwork | Featured image |
+| Dedicated lyrics | Plugin-rendered Lyrics section |
+
+Lyrics are stored separately from descriptions and credits. They are excluded from homepage rows and archive excerpts, displayed in theme-styled sections on both native pages, and shown in a collapsible section for generic player cards. Line breaks and safe basic formatting are preserved.
+
+Bidirectional protected metadata prevents duplicate Soundtrack and Video records. Switching modes moves unused linked records to Draft rather than deleting editorial work.
 
 ## Generic Page Placement
 
@@ -92,6 +115,7 @@ Only import artwork you have the right to publish.
 - Short-link redirects remain restricted to Suno hosts and safe WordPress HTTP requests.
 - External requests have strict timeouts and response-size limits.
 - Direct audio accepts only safe public HTTP(S) URLs with an approved audio extension.
+- Video accepts only validated YouTube/Vimeo hosts or safe direct video extensions.
 - Suno embed URLs are generated from validated IDs rather than arbitrary iframe HTML.
 - Song text is sanitized and output is escaped.
 - The theme is never edited by the plugin.
@@ -123,4 +147,4 @@ Open it in a browser and copy the resulting full `/song/{uuid}` URL.
 
 ## Uninstall Behavior
 
-Managed song and linked Soundtrack records are retained to prevent accidental loss. Native tracks with local audio continue working after plugin removal. Hosted-only tracks need the plugin for the Suno fallback player.
+Managed releases and linked Soundtrack/Video records are retained to prevent accidental loss. Native tracks with local audio and theme video embeds continue working after plugin removal. Hosted-only Suno tracks need the plugin for fallback playback and shared lyrics rendering.

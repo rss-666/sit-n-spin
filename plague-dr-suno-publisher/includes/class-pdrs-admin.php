@@ -61,10 +61,10 @@ final class PDRS_Admin {
                 <form class="pdrs-card" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                     <input type="hidden" name="action" value="pdrs_add_song">
                     <?php wp_nonce_field( 'pdrs_add_song' ); ?>
-                    <h2><?php esc_html_e( 'Add a Suno song', 'plague-dr-suno-publisher' ); ?></h2>
-                    <p><label for="pdrs-url"><strong><?php esc_html_e( 'Public Suno URL', 'plague-dr-suno-publisher' ); ?></strong></label><br>
-                        <input id="pdrs-url" class="large-text" type="url" name="suno_url" required placeholder="https://suno.com/song/…"></p>
-                    <p class="description"><?php esc_html_e( 'Full /song/ and /embed/ links work best. The plugin also attempts to resolve Suno /s/ share links.', 'plague-dr-suno-publisher' ); ?></p>
+                    <h2><?php esc_html_e( 'Add a music release', 'plague-dr-suno-publisher' ); ?></h2>
+                    <p><label for="pdrs-url"><strong><?php esc_html_e( 'Public Suno URL (optional)', 'plague-dr-suno-publisher' ); ?></strong></label><br>
+                        <input id="pdrs-url" class="large-text" type="url" name="suno_url" placeholder="https://suno.com/song/…"></p>
+                    <p class="description"><?php esc_html_e( 'Required for hosted Suno playback, but optional when you provide local audio, YouTube, or Vimeo.', 'plague-dr-suno-publisher' ); ?></p>
                     <p><label for="pdrs-title"><strong><?php esc_html_e( 'Song title', 'plague-dr-suno-publisher' ); ?></strong></label><br>
                         <input id="pdrs-title" class="large-text" type="text" name="song_title" placeholder="<?php esc_attr_e( 'Leave blank to fetch the public Suno title', 'plague-dr-suno-publisher' ); ?>"></p>
                     <p><label for="pdrs-description"><strong><?php esc_html_e( 'Description and credits', 'plague-dr-suno-publisher' ); ?></strong></label><br>
@@ -72,23 +72,26 @@ final class PDRS_Admin {
                     <p><label for="pdrs-lyrics"><strong><?php esc_html_e( 'Lyrics', 'plague-dr-suno-publisher' ); ?></strong></label><br>
                         <textarea id="pdrs-lyrics" class="large-text" name="lyrics" rows="10" placeholder="<?php esc_attr_e( 'Verse 1…', 'plague-dr-suno-publisher' ); ?>"></textarea><br><span class="description"><?php esc_html_e( 'Optional. Line breaks are preserved and lyrics remain separate from archive excerpts.', 'plague-dr-suno-publisher' ); ?></span></p>
                     <p><label for="pdrs-mode"><strong><?php esc_html_e( 'Publishing mode', 'plague-dr-suno-publisher' ); ?></strong></label><br>
-                        <select id="pdrs-mode" name="placement_mode" data-pdrs-mode><option value="pdu_track" <?php disabled( ! $pdu_available ); ?>><?php esc_html_e( 'Plague Dr Universe Soundtrack (recommended)', 'plague-dr-suno-publisher' ); ?></option><option value="destination" <?php selected( ! $pdu_available ); ?>><?php esc_html_e( 'Place player on an existing page or post', 'plague-dr-suno-publisher' ); ?></option></select></p>
+                        <select id="pdrs-mode" name="placement_mode" data-pdrs-mode><option value="pdu_track" <?php disabled( ! $pdu_available ); ?>><?php esc_html_e( 'Theme Soundtrack only', 'plague-dr-suno-publisher' ); ?></option><option value="pdu_video" <?php disabled( ! PDRS_PDU_Integration::video_available() ); ?>><?php esc_html_e( 'Theme Music Video only', 'plague-dr-suno-publisher' ); ?></option><option value="pdu_both" <?php disabled( ! $pdu_available || ! PDRS_PDU_Integration::video_available() ); ?>><?php esc_html_e( 'Theme Soundtrack + Music Video', 'plague-dr-suno-publisher' ); ?></option><option value="destination" <?php selected( ! $pdu_available ); ?>><?php esc_html_e( 'Place Suno player on an existing page or post', 'plague-dr-suno-publisher' ); ?></option></select></p>
                     <?php if ( ! $pdu_available ) : ?><p class="notice notice-warning inline"><?php esc_html_e( 'The active theme does not currently expose the pdu_track Soundtrack type, so page placement will be used.', 'plague-dr-suno-publisher' ); ?></p><?php endif; ?>
-                    <div class="pdrs-theme-fields" data-pdrs-mode-panel="pdu_track">
+                    <p data-pdrs-mode-panel="pdu_track,pdu_video,pdu_both"><label for="pdrs-duration"><strong><?php esc_html_e( 'Duration', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-duration" type="text" name="duration" placeholder="4:12" pattern="[0-9]{1,3}:[0-5][0-9]"></p>
+                    <div class="pdrs-theme-fields" data-pdrs-mode-panel="pdu_track,pdu_both">
                         <h3><?php esc_html_e( 'Theme Soundtrack details', 'plague-dr-suno-publisher' ); ?></h3>
-                        <div class="pdrs-two-column">
-                            <p><label for="pdrs-album"><strong><?php esc_html_e( 'Album / release', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-album" class="large-text" type="text" name="album"></p>
-                            <p><label for="pdrs-duration"><strong><?php esc_html_e( 'Duration', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-duration" type="text" name="duration" placeholder="4:12" pattern="[0-9]{1,3}:[0-5][0-9]"></p>
-                        </div>
+                        <p><label for="pdrs-album"><strong><?php esc_html_e( 'Album / release', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-album" class="large-text" type="text" name="album"></p>
                         <div class="pdrs-two-column">
                             <p><label for="pdrs-genre"><strong><?php esc_html_e( 'Genre', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-genre" class="large-text" type="text" name="genre" placeholder="Doom, ambient, metal…"></p>
                             <p><label for="pdrs-buy-url"><strong><?php esc_html_e( 'Buy / stream URL', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-buy-url" class="large-text" type="url" name="buy_url"></p>
                         </div>
                         <p><label for="pdrs-audio-url"><strong><?php esc_html_e( 'Local audio file (optional)', 'plague-dr-suno-publisher' ); ?></strong></label><br><span class="pdrs-media-field"><input id="pdrs-audio-url" class="large-text" type="url" name="audio_url" placeholder="Choose an MP3/OGG from the Media Library"><button class="button" type="button" data-pdrs-select-audio data-target="pdrs-audio-url"><?php esc_html_e( 'Choose audio', 'plague-dr-suno-publisher' ); ?></button></span><br><span class="description"><?php esc_html_e( 'With a direct file, the theme’s native player works everywhere. Without one, Suno opens in a hosted-player modal and on the track page.', 'plague-dr-suno-publisher' ); ?></span></p>
                     </div>
+                    <div class="pdrs-theme-fields" data-pdrs-mode-panel="pdu_video,pdu_both">
+                        <h3><?php esc_html_e( 'Theme Music Video details', 'plague-dr-suno-publisher' ); ?></h3>
+                        <p><label for="pdrs-video-url"><strong><?php esc_html_e( 'YouTube, Vimeo, or direct video URL', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-video-url" class="large-text" type="url" name="video_url" placeholder="https://www.youtube.com/watch?v=…"></p>
+                        <p><label for="pdrs-video-note"><strong><?php esc_html_e( 'Runtime / release note', 'plague-dr-suno-publisher' ); ?></strong></label><br><input id="pdrs-video-note" class="large-text" type="text" name="video_note" placeholder="Official music video"></p>
+                    </div>
                     <p><label for="pdrs-artwork"><strong><?php esc_html_e( 'Artwork URL', 'plague-dr-suno-publisher' ); ?></strong></label><br>
                         <input id="pdrs-artwork" class="large-text" type="url" name="artwork_url" placeholder="<?php esc_attr_e( 'Optional; Suno artwork is fetched when available', 'plague-dr-suno-publisher' ); ?>"></p>
-                    <p data-pdrs-mode-panel="pdu_track"><label><input type="checkbox" name="import_artwork" value="1" checked> <?php esc_html_e( 'Import this artwork into the Media Library as the theme cover image', 'plague-dr-suno-publisher' ); ?></label></p>
+                    <p data-pdrs-mode-panel="pdu_track,pdu_video,pdu_both"><label><input type="checkbox" name="import_artwork" value="1" checked> <?php esc_html_e( 'Import this artwork into the Media Library as the theme cover image', 'plague-dr-suno-publisher' ); ?></label></p>
                     <div class="pdrs-two-column" data-pdrs-mode-panel="destination">
                         <p><label for="pdrs-destination"><strong><?php esc_html_e( 'Destination', 'plague-dr-suno-publisher' ); ?></strong></label><br>
                             <?php $this->destination_select( 'destination_id', 0, 'pdrs-destination' ); ?></p>
@@ -100,7 +103,7 @@ final class PDRS_Admin {
                     <?php submit_button( __( 'Add song', 'plague-dr-suno-publisher' ), 'primary', 'submit', false ); ?>
                 </form>
                 <aside>
-                    <section class="pdrs-card"><h2><?php esc_html_e( 'Native theme integration', 'plague-dr-suno-publisher' ); ?></h2><p><?php esc_html_e( 'Soundtrack mode creates one linked pdu_track entry for the theme’s homepage, archive, and individual track layout. Updating this managed song updates the same Soundtrack instead of creating duplicates.', 'plague-dr-suno-publisher' ); ?></p></section>
+                    <section class="pdrs-card"><h2><?php esc_html_e( 'Native theme integration', 'plague-dr-suno-publisher' ); ?></h2><p><?php esc_html_e( 'Create a Soundtrack, Music Video, or both from one managed release. Shared title, description, lyrics, duration, artwork, and status stay synchronized without duplicate native posts.', 'plague-dr-suno-publisher' ); ?></p></section>
                     <section class="pdrs-card"><h2><?php esc_html_e( 'Manual placement', 'plague-dr-suno-publisher' ); ?></h2><p><?php esc_html_e( 'Every song also has a shortcode:', 'plague-dr-suno-publisher' ); ?></p><code>[plague_dr_song id="123"]</code><p><?php esc_html_e( 'Use it in a Shortcode block when you want a second placement or precise position inside a layout.', 'plague-dr-suno-publisher' ); ?></p></section>
                     <section class="pdrs-card pdrs-safety"><h2><?php esc_html_e( 'How media is handled', 'plague-dr-suno-publisher' ); ?></h2><p><?php esc_html_e( 'By default, audio remains hosted by Suno. The plugin only uses a local audio file when you explicitly choose one from WordPress. Artwork is imported only when the cover-image option is checked.', 'plague-dr-suno-publisher' ); ?></p></section>
                 </aside>
@@ -115,33 +118,67 @@ final class PDRS_Admin {
         }
         check_admin_referer( 'pdrs_add_song' );
 
-        $resolved = PDRS_Suno_URL::resolve( sanitize_text_field( wp_unslash( (string) ( $_POST['suno_url'] ?? '' ) ) ) );
-        if ( is_wp_error( $resolved ) ) {
-            $this->set_notice( 'error', $resolved->get_error_message() );
+        $requested_mode = sanitize_key( (string) ( $_POST['placement_mode'] ?? '' ) );
+        $placement_mode = 'destination';
+        if ( PDRS_PDU_Integration::MODE === $requested_mode && PDRS_PDU_Integration::available() ) {
+            $placement_mode = PDRS_PDU_Integration::MODE;
+        } elseif ( PDRS_PDU_Integration::MODE_VIDEO === $requested_mode && PDRS_PDU_Integration::video_available() ) {
+            $placement_mode = PDRS_PDU_Integration::MODE_VIDEO;
+        } elseif ( PDRS_PDU_Integration::MODE_BOTH === $requested_mode && PDRS_PDU_Integration::available() && PDRS_PDU_Integration::video_available() ) {
+            $placement_mode = PDRS_PDU_Integration::MODE_BOTH;
+        }
+
+        $suno_url  = sanitize_text_field( wp_unslash( (string) ( $_POST['suno_url'] ?? '' ) ) );
+        $audio_url = PDRS_PDU_Integration::audio_url( wp_unslash( (string) ( $_POST['audio_url'] ?? '' ) ) );
+        $video_url = PDRS_PDU_Integration::video_url( wp_unslash( (string) ( $_POST['video_url'] ?? '' ) ) );
+        $resolved  = array( 'song_id' => '', 'source_url' => '', 'embed_url' => '' );
+        if ( '' !== $suno_url ) {
+            $resolved = PDRS_Suno_URL::resolve( $suno_url );
+            if ( is_wp_error( $resolved ) ) {
+                $this->set_notice( 'error', $resolved->get_error_message() );
+                $this->redirect_add();
+            }
+        }
+
+        $needs_track = PDRS_PDU_Integration::mode_has_track( $placement_mode );
+        $needs_video = PDRS_PDU_Integration::mode_has_video( $placement_mode );
+        if ( 'destination' === $placement_mode && empty( $resolved['song_id'] ) ) {
+            $this->set_notice( 'error', __( 'Page/post placement requires a public Suno song URL.', 'plague-dr-suno-publisher' ) );
             $this->redirect_add();
         }
-        $duplicate = $this->find_song( $resolved['song_id'] );
+        if ( $needs_track && empty( $resolved['song_id'] ) && '' === $audio_url ) {
+            $this->set_notice( 'error', __( 'A Soundtrack needs either a Suno URL or a local audio file.', 'plague-dr-suno-publisher' ) );
+            $this->redirect_add();
+        }
+        if ( $needs_video && '' === $video_url ) {
+            $this->set_notice( 'error', __( 'A Music Video needs a YouTube, Vimeo, or direct video URL.', 'plague-dr-suno-publisher' ) );
+            $this->redirect_add();
+        }
+
+        $duplicate = empty( $resolved['song_id'] ) ? 0 : $this->find_song( $resolved['song_id'] );
+        if ( ! $duplicate && '' !== $video_url ) {
+            $duplicate = $this->find_video( $video_url );
+        }
         if ( $duplicate ) {
-            $this->set_notice( 'warning', __( 'That Suno song is already managed. Its edit screen has been opened.', 'plague-dr-suno-publisher' ) );
+            $this->set_notice( 'warning', __( 'That media source is already managed. Its edit screen has been opened.', 'plague-dr-suno-publisher' ) );
             $this->redirect_edit( $duplicate );
         }
 
-        $placement_mode = PDRS_PDU_Integration::MODE === ( $_POST['placement_mode'] ?? '' ) && PDRS_PDU_Integration::available()
-            ? PDRS_PDU_Integration::MODE
-            : 'destination';
         $destination_id = 'destination' === $placement_mode ? absint( $_POST['destination_id'] ?? 0 ) : 0;
         if ( $destination_id && ! $this->valid_destination( $destination_id ) ) {
             $this->set_notice( 'error', __( 'You cannot edit the selected destination.', 'plague-dr-suno-publisher' ) );
             $this->redirect_add();
         }
 
-        $metadata    = PDRS_Metadata::fetch( $resolved['song_id'] );
+        $metadata    = empty( $resolved['song_id'] ) ? array( 'title' => '', 'description' => '', 'image' => '' ) : PDRS_Metadata::fetch( $resolved['song_id'] );
         $title       = sanitize_text_field( wp_unslash( (string) ( $_POST['song_title'] ?? '' ) ) );
         $description = wp_kses_post( wp_unslash( (string) ( $_POST['song_description'] ?? '' ) ) );
         $lyrics      = wp_kses_post( wp_unslash( (string) ( $_POST['lyrics'] ?? '' ) ) );
         $artwork     = PDRS_Metadata::image_url( wp_unslash( (string) ( $_POST['artwork_url'] ?? '' ) ) );
         if ( '' === $title ) {
-            $title = $metadata['title'] ?: sprintf( /* translators: %s: shortened song ID. */ __( 'Suno Song %s', 'plague-dr-suno-publisher' ), substr( $resolved['song_id'], 0, 8 ) );
+            $title = $metadata['title'] ?: ( $resolved['song_id']
+                ? sprintf( /* translators: %s: shortened song ID. */ __( 'Suno Song %s', 'plague-dr-suno-publisher' ), substr( $resolved['song_id'], 0, 8 ) )
+                : __( 'Untitled Music Release', 'plague-dr-suno-publisher' ) );
         }
         if ( '' === trim( $description ) ) {
             $description = $metadata['description'];
@@ -168,8 +205,12 @@ final class PDRS_Admin {
             $this->redirect_add();
         }
 
-        update_post_meta( $post_id, '_pdrs_song_id', $resolved['song_id'] );
-        update_post_meta( $post_id, '_pdrs_source_url', $resolved['source_url'] );
+        if ( $resolved['song_id'] ) {
+            update_post_meta( $post_id, '_pdrs_song_id', $resolved['song_id'] );
+            update_post_meta( $post_id, '_pdrs_source_url', $resolved['source_url'] );
+        }
+        update_post_meta( $post_id, '_pdrs_video_url', $video_url );
+        update_post_meta( $post_id, '_pdrs_video_note', sanitize_text_field( wp_unslash( (string) ( $_POST['video_note'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_placement_mode', $placement_mode );
         update_post_meta( $post_id, '_pdrs_destination_id', $destination_id );
         update_post_meta( $post_id, '_pdrs_position', 'before' === ( $_POST['position'] ?? '' ) ? 'before' : 'after' );
@@ -179,21 +220,19 @@ final class PDRS_Admin {
         update_post_meta( $post_id, '_pdrs_duration', PDRS_PDU_Integration::duration( wp_unslash( (string) ( $_POST['duration'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_genre', sanitize_text_field( wp_unslash( (string) ( $_POST['genre'] ?? '' ) ) ) );
         update_post_meta( $post_id, '_pdrs_buy_url', esc_url_raw( wp_unslash( (string) ( $_POST['buy_url'] ?? '' ) ), array( 'http', 'https' ) ) );
-        update_post_meta( $post_id, '_pdrs_audio_url', PDRS_PDU_Integration::audio_url( wp_unslash( (string) ( $_POST['audio_url'] ?? '' ) ) ) );
+        update_post_meta( $post_id, '_pdrs_audio_url', $audio_url );
         update_post_meta( $post_id, '_pdrs_import_artwork', empty( $_POST['import_artwork'] ) ? 0 : 1 );
 
-        $linked_id = 0;
-        if ( PDRS_PDU_Integration::MODE === $placement_mode ) {
+        if ( 'destination' !== $placement_mode ) {
             $synced = PDRS_PDU_Integration::sync_song( (int) $post_id );
             if ( is_wp_error( $synced ) ) {
                 $this->set_notice( 'error', $synced->get_error_message() );
                 $this->redirect_edit( (int) $post_id );
             }
-            $linked_id = (int) $synced;
         }
 
-        $message = PDRS_PDU_Integration::MODE === $placement_mode
-            ? sprintf( /* translators: %d: linked Soundtrack post ID. */ __( 'Song saved and synced to theme Soundtrack #%d.', 'plague-dr-suno-publisher' ), $linked_id )
+        $message = 'destination' !== $placement_mode
+            ? __( 'Music release saved and synchronized with the selected native theme content.', 'plague-dr-suno-publisher' )
             : ( 'publish' === $status
                 ? __( 'Song added and activated on its selected destination.', 'plague-dr-suno-publisher' )
                 : __( 'Song saved as a draft. Review it and publish when ready.', 'plague-dr-suno-publisher' ) );
@@ -227,6 +266,9 @@ final class PDRS_Admin {
         $artwork     = (string) get_post_meta( $post->ID, '_pdrs_artwork_url', true );
         $mode        = PDRS_PDU_Integration::mode_for( (int) $post->ID );
         $track_id    = PDRS_PDU_Integration::linked_track_id( (int) $post->ID );
+        $video_id    = PDRS_PDU_Integration::linked_video_id( (int) $post->ID );
+        $video_url   = (string) get_post_meta( $post->ID, '_pdrs_video_url', true );
+        $video_note  = (string) get_post_meta( $post->ID, '_pdrs_video_note', true );
         $album       = (string) get_post_meta( $post->ID, '_pdrs_album', true );
         $duration    = (string) get_post_meta( $post->ID, '_pdrs_duration', true );
         $genre       = (string) get_post_meta( $post->ID, '_pdrs_genre', true );
@@ -235,17 +277,22 @@ final class PDRS_Admin {
         $import_art  = (bool) get_post_meta( $post->ID, '_pdrs_import_artwork', true );
         wp_nonce_field( 'pdrs_save_song_' . $post->ID, 'pdrs_song_nonce' );
         ?>
-        <p><label for="pdrs-song-url"><strong><?php esc_html_e( 'Suno song URL', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-url" class="widefat" type="url" name="pdrs_song_url" value="<?php echo esc_attr( $source ); ?>"></p>
-        <p><label for="pdrs-song-mode"><strong><?php esc_html_e( 'Publishing mode', 'plague-dr-suno-publisher' ); ?></strong></label><select class="widefat" id="pdrs-song-mode" name="pdrs_placement_mode" data-pdrs-mode><option value="pdu_track" <?php selected( $mode, 'pdu_track' ); disabled( ! PDRS_PDU_Integration::available() ); ?>><?php esc_html_e( 'Theme Soundtrack', 'plague-dr-suno-publisher' ); ?></option><option value="destination" <?php selected( $mode, 'destination' ); ?>><?php esc_html_e( 'Page/post destination', 'plague-dr-suno-publisher' ); ?></option></select></p>
-        <div data-pdrs-mode-panel="pdu_track">
+        <p><label for="pdrs-song-url"><strong><?php esc_html_e( 'Suno song URL (optional)', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-url" class="widefat" type="url" name="pdrs_song_url" value="<?php echo esc_attr( $source ); ?>"></p>
+        <p><label for="pdrs-song-mode"><strong><?php esc_html_e( 'Publishing mode', 'plague-dr-suno-publisher' ); ?></strong></label><select class="widefat" id="pdrs-song-mode" name="pdrs_placement_mode" data-pdrs-mode><option value="pdu_track" <?php selected( $mode, 'pdu_track' ); disabled( ! PDRS_PDU_Integration::available() ); ?>><?php esc_html_e( 'Theme Soundtrack only', 'plague-dr-suno-publisher' ); ?></option><option value="pdu_video" <?php selected( $mode, 'pdu_video' ); disabled( ! PDRS_PDU_Integration::video_available() ); ?>><?php esc_html_e( 'Theme Music Video only', 'plague-dr-suno-publisher' ); ?></option><option value="pdu_both" <?php selected( $mode, 'pdu_both' ); disabled( ! PDRS_PDU_Integration::available() || ! PDRS_PDU_Integration::video_available() ); ?>><?php esc_html_e( 'Theme Soundtrack + Music Video', 'plague-dr-suno-publisher' ); ?></option><option value="destination" <?php selected( $mode, 'destination' ); ?>><?php esc_html_e( 'Page/post destination', 'plague-dr-suno-publisher' ); ?></option></select></p>
+        <p data-pdrs-mode-panel="pdu_track,pdu_video,pdu_both"><label for="pdrs-song-duration"><strong><?php esc_html_e( 'Duration', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-duration" class="widefat" type="text" name="pdrs_duration" value="<?php echo esc_attr( $duration ); ?>" placeholder="4:12"></p>
+        <div data-pdrs-mode-panel="pdu_track,pdu_both">
             <p><label for="pdrs-song-album"><strong><?php esc_html_e( 'Album / release', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-album" class="widefat" type="text" name="pdrs_album" value="<?php echo esc_attr( $album ); ?>"></p>
-            <p><label for="pdrs-song-duration"><strong><?php esc_html_e( 'Duration', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-duration" class="widefat" type="text" name="pdrs_duration" value="<?php echo esc_attr( $duration ); ?>" placeholder="4:12"></p>
             <p><label for="pdrs-song-genre"><strong><?php esc_html_e( 'Genre', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-genre" class="widefat" type="text" name="pdrs_genre" value="<?php echo esc_attr( $genre ); ?>"></p>
             <p><label for="pdrs-song-buy"><strong><?php esc_html_e( 'Buy / stream URL', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-buy" class="widefat" type="url" name="pdrs_buy_url" value="<?php echo esc_attr( $buy_url ); ?>"></p>
             <p><label for="pdrs-song-audio"><strong><?php esc_html_e( 'Local audio (optional)', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-audio" class="widefat" type="url" name="pdrs_audio_url" value="<?php echo esc_attr( $audio_url ); ?>"><button class="button" type="button" data-pdrs-select-audio data-target="pdrs-song-audio"><?php esc_html_e( 'Choose audio', 'plague-dr-suno-publisher' ); ?></button></p>
-            <p><label><input type="checkbox" name="pdrs_import_artwork" value="1" <?php checked( $import_art ); ?>> <?php esc_html_e( 'Import artwork as cover image', 'plague-dr-suno-publisher' ); ?></label></p>
             <?php if ( $track_id ) : ?><p><a href="<?php echo esc_url( get_edit_post_link( $track_id ) ); ?>"><?php esc_html_e( 'Edit linked theme Soundtrack', 'plague-dr-suno-publisher' ); ?></a> · <a href="<?php echo esc_url( get_permalink( $track_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View', 'plague-dr-suno-publisher' ); ?></a></p><?php endif; ?>
         </div>
+        <div data-pdrs-mode-panel="pdu_video,pdu_both">
+            <p><label for="pdrs-song-video"><strong><?php esc_html_e( 'YouTube, Vimeo, or direct video URL', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-video" class="widefat" type="url" name="pdrs_video_url" value="<?php echo esc_attr( $video_url ); ?>"></p>
+            <p><label for="pdrs-song-video-note"><strong><?php esc_html_e( 'Runtime / release note', 'plague-dr-suno-publisher' ); ?></strong></label><input id="pdrs-song-video-note" class="widefat" type="text" name="pdrs_video_note" value="<?php echo esc_attr( $video_note ); ?>"></p>
+            <?php if ( $video_id ) : ?><p><a href="<?php echo esc_url( get_edit_post_link( $video_id ) ); ?>"><?php esc_html_e( 'Edit linked theme Video Release', 'plague-dr-suno-publisher' ); ?></a> · <a href="<?php echo esc_url( get_permalink( $video_id ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View', 'plague-dr-suno-publisher' ); ?></a></p><?php endif; ?>
+        </div>
+        <p data-pdrs-mode-panel="pdu_track,pdu_video,pdu_both"><label><input type="checkbox" name="pdrs_import_artwork" value="1" <?php checked( $import_art ); ?>> <?php esc_html_e( 'Import artwork as cover image', 'plague-dr-suno-publisher' ); ?></label></p>
         <div data-pdrs-mode-panel="destination">
             <p><label for="pdrs-song-destination"><strong><?php esc_html_e( 'Destination', 'plague-dr-suno-publisher' ); ?></strong></label><?php $this->destination_select( 'pdrs_destination_id', $destination, 'pdrs-song-destination' ); ?></p>
             <p><label for="pdrs-song-position"><strong><?php esc_html_e( 'Placement', 'plague-dr-suno-publisher' ); ?></strong></label><select class="widefat" id="pdrs-song-position" name="pdrs_position"><option value="after" <?php selected( $position, 'after' ); ?>><?php esc_html_e( 'After page content', 'plague-dr-suno-publisher' ); ?></option><option value="before" <?php selected( $position, 'before' ); ?>><?php esc_html_e( 'Before page content', 'plague-dr-suno-publisher' ); ?></option></select></p>
@@ -259,7 +306,7 @@ final class PDRS_Admin {
     public function lyrics_meta_box_html( WP_Post $post ): void {
         $lyrics = (string) get_post_meta( $post->ID, '_pdrs_lyrics', true );
         ?>
-        <p class="description"><?php esc_html_e( 'Lyrics are kept separate from the description, excluded from archive excerpts, and shown in a dedicated section on the public song or Soundtrack page.', 'plague-dr-suno-publisher' ); ?></p>
+        <p class="description"><?php esc_html_e( 'Lyrics are stored once, excluded from archive excerpts, and shown on linked Soundtrack and Music Video pages.', 'plague-dr-suno-publisher' ); ?></p>
         <textarea class="widefat pdrs-lyrics-editor" name="pdrs_lyrics" rows="16" placeholder="<?php esc_attr_e( 'Verse 1…', 'plague-dr-suno-publisher' ); ?>"><?php echo esc_textarea( $lyrics ); ?></textarea>
         <?php
     }
@@ -271,6 +318,17 @@ final class PDRS_Admin {
         if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
             return;
         }
+
+        $requested_mode = sanitize_key( (string) ( $_POST['pdrs_placement_mode'] ?? '' ) );
+        $mode = 'destination';
+        if ( PDRS_PDU_Integration::MODE === $requested_mode && PDRS_PDU_Integration::available() ) {
+            $mode = PDRS_PDU_Integration::MODE;
+        } elseif ( PDRS_PDU_Integration::MODE_VIDEO === $requested_mode && PDRS_PDU_Integration::video_available() ) {
+            $mode = PDRS_PDU_Integration::MODE_VIDEO;
+        } elseif ( PDRS_PDU_Integration::MODE_BOTH === $requested_mode && PDRS_PDU_Integration::available() && PDRS_PDU_Integration::video_available() ) {
+            $mode = PDRS_PDU_Integration::MODE_BOTH;
+        }
+        update_post_meta( $post_id, '_pdrs_placement_mode', $mode );
 
         $url = sanitize_text_field( wp_unslash( (string) ( $_POST['pdrs_song_url'] ?? '' ) ) );
         if ( '' !== $url ) {
@@ -286,12 +344,19 @@ final class PDRS_Admin {
                     update_post_meta( $post_id, '_pdrs_source_url', $resolved['source_url'] );
                 }
             }
+        } elseif ( PDRS_PDU_Integration::MODE_VIDEO === $mode ) {
+            delete_post_meta( $post_id, '_pdrs_song_id' );
+            delete_post_meta( $post_id, '_pdrs_source_url' );
         }
 
-        $mode = PDRS_PDU_Integration::MODE === ( $_POST['pdrs_placement_mode'] ?? '' ) && PDRS_PDU_Integration::available()
-            ? PDRS_PDU_Integration::MODE
-            : 'destination';
-        update_post_meta( $post_id, '_pdrs_placement_mode', $mode );
+        $video_url = PDRS_PDU_Integration::video_url( wp_unslash( (string) ( $_POST['pdrs_video_url'] ?? '' ) ) );
+        $video_duplicate = $this->find_video( $video_url, $post_id );
+        if ( $video_duplicate ) {
+            $this->set_notice( 'error', __( 'Another managed release already uses that video URL.', 'plague-dr-suno-publisher' ) );
+        } else {
+            update_post_meta( $post_id, '_pdrs_video_url', $video_url );
+        }
+        update_post_meta( $post_id, '_pdrs_video_note', sanitize_text_field( wp_unslash( (string) ( $_POST['pdrs_video_note'] ?? '' ) ) ) );
 
         $destination_id = 'destination' === $mode ? absint( $_POST['pdrs_destination_id'] ?? 0 ) : 0;
         if ( 0 === $destination_id || $this->valid_destination( $destination_id ) ) {
@@ -322,10 +387,18 @@ final class PDRS_Admin {
 
     public function column( string $column, int $post_id ): void {
         if ( 'pdrs_destination' === $column ) {
-            if ( PDRS_PDU_Integration::MODE === PDRS_PDU_Integration::mode_for( $post_id ) ) {
+            $mode = PDRS_PDU_Integration::mode_for( $post_id );
+            if ( PDRS_PDU_Integration::mode_has_track( $mode ) || PDRS_PDU_Integration::mode_has_video( $mode ) ) {
+                $links = array();
                 $track_id = PDRS_PDU_Integration::linked_track_id( $post_id );
-                $link     = $track_id ? get_edit_post_link( $track_id ) : '';
-                echo $track_id ? '<a href="' . esc_url( $link ) . '">' . esc_html__( 'Theme Soundtrack', 'plague-dr-suno-publisher' ) . ' #' . esc_html( (string) $track_id ) . '</a>' : esc_html__( 'Theme Soundtrack (pending sync)', 'plague-dr-suno-publisher' );
+                $video_id = PDRS_PDU_Integration::linked_video_id( $post_id );
+                if ( PDRS_PDU_Integration::mode_has_track( $mode ) ) {
+                    $links[] = $track_id ? '<a href="' . esc_url( get_edit_post_link( $track_id ) ) . '">' . esc_html__( 'Soundtrack', 'plague-dr-suno-publisher' ) . ' #' . esc_html( (string) $track_id ) . '</a>' : esc_html__( 'Soundtrack pending', 'plague-dr-suno-publisher' );
+                }
+                if ( PDRS_PDU_Integration::mode_has_video( $mode ) ) {
+                    $links[] = $video_id ? '<a href="' . esc_url( get_edit_post_link( $video_id ) ) . '">' . esc_html__( 'Video', 'plague-dr-suno-publisher' ) . ' #' . esc_html( (string) $video_id ) . '</a>' : esc_html__( 'Video pending', 'plague-dr-suno-publisher' );
+                }
+                echo wp_kses_post( implode( '<br>', $links ) );
                 return;
             }
             $destination_id = (int) get_post_meta( $post_id, '_pdrs_destination_id', true );
@@ -414,6 +487,25 @@ final class PDRS_Admin {
                 'post__not_in'   => $exclude ? array( $exclude ) : array(),
                 'meta_key'       => '_pdrs_song_id',
                 'meta_value'     => $song_id,
+                'no_found_rows'  => true,
+            )
+        );
+        return empty( $posts ) ? 0 : (int) $posts[0];
+    }
+
+    private function find_video( string $video_url, int $exclude = 0 ): int {
+        if ( '' === $video_url ) {
+            return 0;
+        }
+        $posts = get_posts(
+            array(
+                'post_type'      => PDRS_Plugin::POST_TYPE,
+                'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'trash' ),
+                'posts_per_page' => 1,
+                'fields'         => 'ids',
+                'post__not_in'   => $exclude ? array( $exclude ) : array(),
+                'meta_key'       => '_pdrs_video_url',
+                'meta_value'     => $video_url,
                 'no_found_rows'  => true,
             )
         );

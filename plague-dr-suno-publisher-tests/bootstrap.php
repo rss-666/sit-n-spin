@@ -67,7 +67,12 @@ function wp_trim_words( string $text, int $number = 55, string $more = null ): s
 function taxonomy_exists( string $taxonomy ): bool { return false; }
 function wp_set_object_terms( int $object_id, $terms, string $taxonomy, bool $append = false ): array { return array(); }
 function wp_is_post_revision( int $id ): bool { return false; }
-function get_permalink( $post = 0 ): string { $id = is_object( $post ) ? $post->ID : (int) $post; return 'https://plaguedr.test/soundtracks/' . $id . '/'; }
+function get_permalink( $post = 0 ): string { $id = is_object( $post ) ? $post->ID : (int) $post; return 'https://plaguedr.test/content/' . $id . '/'; }
+function has_post_thumbnail( int $post_id = 0 ): bool { return ! empty( $GLOBALS['pdrs_meta'][ $post_id ]['_thumbnail_id'] ); }
+function get_post_thumbnail_id( int $post_id = 0 ): int { return (int) ( $GLOBALS['pdrs_meta'][ $post_id ]['_thumbnail_id'] ?? 0 ); }
+function set_post_thumbnail( int $post_id, int $thumbnail_id ): bool { $GLOBALS['pdrs_meta'][ $post_id ]['_thumbnail_id'] = $thumbnail_id; return true; }
+function wp_trash_post( int $post_id ) { if ( isset( $GLOBALS['pdrs_posts'][ $post_id ] ) ) $GLOBALS['pdrs_posts'][ $post_id ]->post_status = 'trash'; return get_post( $post_id ); }
+function wp_untrash_post( int $post_id ) { if ( isset( $GLOBALS['pdrs_posts'][ $post_id ] ) ) $GLOBALS['pdrs_posts'][ $post_id ]->post_status = 'draft'; return get_post( $post_id ); }
 function get_the_title( $post ): string {
     $object = is_object( $post ) ? $post : get_post( (int) $post );
     return $object ? (string) $object->post_title : '';
@@ -87,7 +92,7 @@ function get_posts( array $args ): array {
 }
 function is_admin(): bool { return false; }
 function is_feed(): bool { return false; }
-function post_type_exists( string $post_type ): bool { return in_array( $post_type, array( PDRS_Plugin::POST_TYPE, 'pdu_track' ), true ); }
+function post_type_exists( string $post_type ): bool { return in_array( $post_type, array( PDRS_Plugin::POST_TYPE, 'pdu_track', 'pdu_video' ), true ); }
 function is_singular(): bool { return true; }
 function get_queried_object_id(): int { return (int) $GLOBALS['pdrs_queried_id']; }
 function get_the_ID(): int { return (int) $GLOBALS['pdrs_queried_id']; }

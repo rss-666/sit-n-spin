@@ -278,7 +278,7 @@ See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for feed, cron, provider,
 
 ## Additional Standalone Plugin
 
-This repository also includes **Plague Dr Suno Publisher** in `plague-dr-suno-publisher/`. It accepts a public Suno song URL and can either create/synchronize a native The Plague Dr Universe `pdu_track` Soundtrack or place the hosted player on another WordPress page/post. Theme mode supports album, duration, genre, buy URL, optional local Media Library audio, cover art, native theme playback, and hosted Suno fallback without modifying theme files.
+This repository also includes **Plague Dr Suno Publisher** in `plague-dr-suno-publisher/`. It manages Suno, local-audio, YouTube, Vimeo, and direct-video music releases. Theme modes create/synchronize native `pdu_track` Soundtracks, `pdu_video` Music Videos, or both from one shared title, description, lyrics, duration, artwork, and status record—without modifying theme files. Generic page placement and shortcodes remain available on other themes.
 
 Build its installable package with:
 

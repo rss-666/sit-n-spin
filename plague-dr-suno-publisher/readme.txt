@@ -4,18 +4,20 @@ Tags: suno, music, audio, embed, soundtracks
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Publish public Suno songs as native Plague Dr Universe Soundtracks or place them on any WordPress page.
+Manage Suno, local-audio, YouTube, and Vimeo releases as native Plague Dr Universe music content.
 
 == Description ==
 
-Plague Dr Suno Publisher provides two publishing modes:
+Plague Dr Suno Publisher provides four publishing modes:
 
-1. **Plague Dr Universe Soundtrack** — creates and synchronizes the theme's native `pdu_track` entry so the song appears in the homepage Now Streaming list, `/soundtracks/` archive, and themed individual track layout.
-2. **Page/post destination** — dynamically places the hosted Suno player before or after another WordPress page or post without rewriting its stored content.
+1. **Theme Soundtrack only** — creates and synchronizes native `pdu_track` content for Now Streaming and `/soundtracks/`.
+2. **Theme Music Video only** — creates and synchronizes native `pdu_video` content for the homepage video section and `/videos/` without requiring Suno.
+3. **Theme Soundtrack + Music Video** — creates one linked entry of each type from one managed release.
+4. **Page/post destination** — dynamically places a hosted Suno player before or after another WordPress page/post.
 
 Every managed song also receives a shortcode:
 
@@ -27,18 +29,18 @@ Every managed song also receives a shortcode:
 - Leave Local audio empty to use Suno's official hosted player. On the homepage and media track lists, the play button opens an accessible modal. The individual Soundtrack page displays the hosted player.
 - A Suno webpage is never incorrectly passed to the HTML audio element as an audio file.
 
-=== Theme metadata ===
+=== Theme metadata and shared lyrics ===
 
-Soundtrack mode synchronizes title, description, excerpt, status, album, duration, genre, buy/stream URL, and optional cover artwork. Updating the managed song updates the same linked Soundtrack instead of creating duplicates. New songs default to Draft.
+Soundtrack mode synchronizes title, description, excerpt, status, album, duration, genre, buy/stream URL, and cover artwork. Video mode synchronizes title, description, status, duration, runtime note, YouTube/Vimeo/direct-video URL, and artwork. Lyrics are stored once and rendered on both linked pages without entering archive excerpts. Updating a release updates the same linked native records instead of creating duplicates.
 
 == Installation ==
 
-1. Upload `plague-dr-suno-publisher-1.2.0.zip` through Plugins -> Add New Plugin -> Upload Plugin.
+1. Upload `plague-dr-suno-publisher-1.3.0.zip` through Plugins -> Add New Plugin -> Upload Plugin.
 2. Activate Plague Dr Suno Publisher.
 3. Open Plague Dr Music -> Add from Suno.
-4. Paste a public full Suno song URL.
-5. Leave Publishing mode on Plague Dr Universe Soundtrack when that theme is active.
-6. Add album, duration, genre, purchase URL, and optional local audio.
+4. Choose Soundtrack, Music Video, Both, or page placement.
+5. Provide Suno/local audio for a Soundtrack and/or YouTube/Vimeo for a Video Release.
+6. Add shared lyrics, description, duration, artwork, and the applicable track/video metadata.
 7. Save as Draft or Active.
 
 == Frequently Asked Questions ==
@@ -55,9 +57,13 @@ No. The theme's Audio File URL expects direct audio bytes such as an MP3. The pl
 
 Download a song you own through your Suno account, upload the audio file to WordPress Media Library, and choose it under Local audio. Only use media you have the right to publish.
 
-= Will syncing create duplicate Soundtrack posts? =
+= Will syncing create duplicate Soundtrack or Video posts? =
 
-No. The plugin stores relationships in both directions and updates the same `pdu_track` entry. Trashing the managed song also trashes its linked Soundtrack.
+No. The plugin stores relationships in both directions and updates the same linked `pdu_track` and `pdu_video` entries. Trashing the managed release also trashes both linked records.
+
+= Where are lyrics stored when I publish both? =
+
+Lyrics are stored once on the managed release. The plugin renders that same reviewed text on both linked pages, while keeping it out of homepage rows and archive excerpts.
 
 = Can I still place a player on another page? =
 
@@ -72,6 +78,13 @@ Suno or its anti-bot layer may prevent server-side short-link resolution. Open i
 A metadata request is sent to Suno only when a song is added and public title, description, or artwork is needed. The hosted iframe is loaded on an individual track page or after a visitor presses a hosted track's play button. No Suno account credential or API key is collected.
 
 == Changelog ==
+
+= 1.3.0 =
+* Added YouTube, Vimeo, and direct-video source validation.
+* Added Soundtrack only, Music Video only, Soundtrack + Music Video, and page-placement publishing modes.
+* Added native `pdu_video` synchronization with duration, runtime note, artwork, status, and duplicate prevention.
+* Shared one lyrics record across linked Soundtrack and Music Video pages.
+* Added video-only releases that do not require a Suno URL.
 
 = 1.2.0 =
 * Added a dedicated lyrics editor separate from descriptions and credits.

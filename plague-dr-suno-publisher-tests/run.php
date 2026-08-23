@@ -166,5 +166,55 @@ pdrs_test( 'Theme track uses native audio when present and Suno fallback when ab
     pdrs_assert( str_contains( $fallback, 'The street remembers' ) );
 } );
 
+pdrs_test( 'YouTube and Vimeo are accepted as video sources but ordinary webpages are rejected', static function (): void {
+    pdrs_same( 'https://www.youtube.com/watch?v=abc123', PDRS_PDU_Integration::video_url( 'https://www.youtube.com/watch?v=abc123' ) );
+    pdrs_same( 'https://vimeo.com/123456', PDRS_PDU_Integration::video_url( 'https://vimeo.com/123456' ) );
+    pdrs_same( '', PDRS_PDU_Integration::video_url( 'https://example.com/watch/123' ) );
+} );
+
+pdrs_test( 'Both mode creates one linked Soundtrack and one linked Video with shared lyrics', static function (): void {
+    update_post_meta( 300, '_pdrs_placement_mode', PDRS_PDU_Integration::MODE_BOTH );
+    update_post_meta( 300, '_pdrs_video_url', 'https://www.youtube.com/watch?v=abc123' );
+    update_post_meta( 300, '_pdrs_video_note', 'Official music video' );
+    $track_id = PDRS_PDU_Integration::sync_song( 300 );
+    $video_id = PDRS_PDU_Integration::linked_video_id( 300 );
+    pdrs_assert( is_int( $track_id ) && $track_id > 0 );
+    pdrs_assert( $video_id > 0 && 'pdu_video' === get_post_type( $video_id ) );
+    pdrs_same( 'https://www.youtube.com/watch?v=abc123', get_post_meta( $video_id, 'pdu_video_url', true ) );
+    pdrs_same( 'Official music video', get_post_meta( $video_id, 'pdu_runtime_note', true ) );
+
+    $again = PDRS_PDU_Integration::sync_song( 300 );
+    pdrs_same( $track_id, $again );
+    pdrs_same( $video_id, PDRS_PDU_Integration::linked_video_id( 300 ) );
+    $videos = array_filter( $GLOBALS['pdrs_posts'], static fn( $post ): bool => 'pdu_video' === $post->post_type );
+    pdrs_same( 1, count( $videos ) );
+
+    $GLOBALS['pdrs_queried_id'] = $video_id;
+    $video_content = ( new PDRS_PDU_Integration() )->single_track_player( '<p>Video description</p>' );
+    pdrs_assert( str_contains( $video_content, 'Video description' ) );
+    pdrs_assert( str_contains( $video_content, 'The street remembers' ) );
+} );
+
+pdrs_test( 'Video-only mode works without a Suno URL and does not create a Soundtrack', static function (): void {
+    $GLOBALS['pdrs_posts'][400] = (object) array(
+        'ID' => 400,
+        'post_type' => PDRS_Plugin::POST_TYPE,
+        'post_status' => 'draft',
+        'post_title' => 'YouTube Only Release',
+        'post_content' => 'Video release notes.',
+        'post_author' => 1,
+    );
+    $GLOBALS['pdrs_meta'][400] = array(
+        '_pdrs_placement_mode' => PDRS_PDU_Integration::MODE_VIDEO,
+        '_pdrs_video_url' => 'https://youtu.be/abc123',
+        '_pdrs_lyrics' => 'One shared lyric record',
+        '_pdrs_import_artwork' => 0,
+    );
+    $result = PDRS_PDU_Integration::sync_song( 400 );
+    pdrs_assert( is_int( $result ) && 'pdu_video' === get_post_type( $result ) );
+    pdrs_same( 0, PDRS_PDU_Integration::linked_track_id( 400 ) );
+    pdrs_same( 'draft', get_post_status( $result ) );
+} );
+
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed ? 1 : 0 );
